@@ -56,6 +56,7 @@ GEM
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
       mime-types (>= 1.16)
+    chartkick (2.2.5)
     childprocess (0.6.3)
       ffi (~> 1.0, >= 1.0.11)
     coffee-rails (4.2.1)
@@ -279,6 +280,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   carrierwave
+  chartkick
   coffee-rails
   cucumber-rails
   database_cleaner
@@ -313,4 +315,4 @@ DEPENDENCIES
   will_paginate-bootstrap
 
 BUNDLED WITH
-   1.15.1
+   1.16.0

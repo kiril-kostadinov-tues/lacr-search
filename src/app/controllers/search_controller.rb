@@ -42,6 +42,36 @@ class SearchController < ApplicationController
     render json: {} # Render this if one of the 2 if statements fails
   end
 
+  def chart_data
+    if params[:term]
+      query = params[:term].strip.gsub(/[^0-9a-z]/i, '')
+
+      results = Search.search(query, {
+          fields: ['content'], # Autocomplete for words in content
+          match: :word_start, # Use word_start method
+          highlight: {tag: "" ,
+          fields: {content: {fragment_size: 0}}}, # Highlight only single word
+          #  limit: 10, # Limit the number of results
+          load: false, # Do not query the database (PostgreSQL)
+          misspellings: {
+            edit_distance: 1, # Limit misspelled distance to 1
+            below: 4, # Do not use misspellings if there are more than 4 results
+            transpositions: false # Show more accurate results
+          }
+        }
+      ).pluck(:date, :entry)
+
+      results.each do |r|
+        r[0] = r[0].slice!(0..3)
+      end
+
+      data = results.group_by {|year, record| year}.map {|year, match| [year, match.count]}
+      render json: (data)
+      return      
+    end
+    render json: {}
+  end
+
   # Simple Search
   def search
     redirect_to doc_path if Search.count.zero? # Fix search on empty DB

@@ -31,6 +31,7 @@
           <div class="checkbox" style="display: inline-block; float: inline-end;">
             <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
           </div>
+          <%= link_to "Edit Document", doc_edit_path(:id => document.id), :method => :post %>  
 				</div>
 			</div> <!-- panel-body -->
 		</div> <!-- panel panel-primary -->

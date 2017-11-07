@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get 'doc', to: "documents#index"
   get 'doc/new', to: "documents#new"
   post 'doc/new', to: "documents#upload"
+  post 'doc/:id/edit', to: "documents#edit", as: "doc_edit"
+  post 'doc/edit', to: "documents#edit_finished"
   get 'doc/show', to: "documents#show"
   get 'doc/page', to: "documents#page"
   get 'doc/page-s', to: "documents#page_simplified"

@@ -107,7 +107,7 @@ class TranscriptionXml < ApplicationRecord
       # Convert the 'entry' and 'date' Nokogiri objects to Ruby Hashes
       entry_id = entry.xpath("@xml:id").to_s
       entry_lang = entry.xpath("@xml:lang").to_s
-      case entry_lang # Fix language standad
+      case entry_lang # Fix language standard
       when 'sc'
         entry_lang = 'sco'
       when 'la'

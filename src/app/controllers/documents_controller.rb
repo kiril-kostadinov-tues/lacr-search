@@ -33,6 +33,30 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def edit
+    if user_signed_in? and current_user.admin?
+      @content = TrParagraph.find(params[:id]).content_xml
+    else
+      redirect_to new_user_session_path, :alert => "Not logged in or Insufficient rights!"  
+    end
+  end
+
+  def edit_finished
+    if user_signed_in? and current_user.admin?
+      xml = params[:transcription_xml][:new_xml]
+      @new_text = TrParagraph.find(params[:edited_document_id])
+      @new_text.content_xml = xml
+      @new_text.save
+      @new_text = TrParagraph.find(params[:edited_document_id])
+      @new_text.content_html = Nokogiri::XML(xml)
+      #xml_to_html(@new_text.content_html)
+      @new_text.save
+      redirect_to doc_path
+    else
+      redirect_to new_user_session_path, :alert => "Not logged in or Insufficient rights!"
+    end
+  end
+
   def show
     if params.has_key?(:p) and params.has_key?(:v) \
       and params[:v].to_i > 0 and  params[:v].to_i < 1000000 \
@@ -224,6 +248,24 @@ class DocumentsController < ApplicationController
     end # if user_signed_in?
 
   end
+
+  # Recursive function to convert the XML format to valid HTML5
+  def xml_to_html(tag)
+    tag.children().each do |c|
+      # Rename the attributes
+      c.keys.each do |k|
+        c["data-#{k}"] = c.delete(k)
+      end
+      # Rename the tag and replace lb with br
+      c['class'] = "xml-tag #{c.name.gsub(':', '-')}"
+      # To avoid invalid void tags: Use "br" if "lb", otherwise "span"
+      c.name = c.name == 'lb' ?  "br" : "span"
+      # Use recursion
+      xml_to_html(c)
+    end
+  end
+
+
 
   private  # all methods that follow will be made private: not accessible for outside objects
     def xml_upload_params

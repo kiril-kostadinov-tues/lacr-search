@@ -2,7 +2,17 @@ require "#{Rails.root}/lib/BaseXClient"
 
 class DocumentsController < ApplicationController
 
-  def index; end
+  def index
+    @documents = Search.select(:page, :volume).distinct.order(volume: :asc, page: :asc).group(:volume, :page)
+    @images = []
+    
+    @documents.each do |document|
+      image = PageImage.find_by_volume_and_page(document.volume, document.page)
+      if image
+        @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+      end
+    end
+  end
 
   def selected
     selected_entries = cookies[:selected_entries]
@@ -20,6 +30,7 @@ class DocumentsController < ApplicationController
 
   def list
     @documents = Search.select(:page, :volume).distinct.order(volume: :asc, page: :asc).group(:volume, :page)
+    
     respond_to do |format|
       format.html { redirect_to doc_path }
       format.json { render json: @documents }

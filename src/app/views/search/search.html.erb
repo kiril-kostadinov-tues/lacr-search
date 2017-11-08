@@ -12,14 +12,29 @@
     </div>
     <div class="col-xs-6 text-right">
       <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
+<<<<<<< HEAD
       <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();loadPieData();">Toggle Charts</button>
+=======
+      <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
+        <%= fa_icon "eye", text: "Toggle Gallery" %>
+      </button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+>>>>>>> af1b736... Added option to view results in the form of a gallery
     </div>
     <%else%>
     <div class="col-xs-12 text-right">
       <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
+<<<<<<< HEAD
       <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();loadPieData();">Toggle Charts</button>
+=======
+      <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
+        <%= fa_icon "eye", text: "Toggle Gallery" %>
+      </button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+>>>>>>> af1b736... Added option to view results in the form of a gallery
     </div>
     <%end%>
+    
   </div>
 <%rescue%>
 <%end%>
@@ -31,7 +46,7 @@
        <div id="bar-chart" style="visibility: hidden; height: 0"></div>
     </div>
   </div>
-  <div class="list-group">
+  <div id="res" class="list-group">
     <% @documents.each do |document| %>
     <% begin highlighted = "&highlight="+Nokogiri::HTML.fragment(document.highlighted_content).css('mark').collect(&:text).uniq.join('+') rescue highlighted = "" end%>
 
@@ -48,6 +63,13 @@
       <mdall>ID: <%= document.entry %></mdall>
     </a>
     <% end %>
+  </div>
+  <div id="gallery" class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6" style="visibility: hidden; height: 0">
+    <div id="flipbook">
+      <% @images.each do |image| %>
+        <%= image_tag(image) %>
+      <% end %>
+    </div>
   </div>
   <div class="row">
     <div class="text-center">
@@ -106,3 +128,11 @@
   </script>
 <%end%>
 <%end%>
+
+<script>
+  $("#flipbook").turn({
+    width: 800,
+    height: 600,
+    autoCenter: true
+  });
+</script>

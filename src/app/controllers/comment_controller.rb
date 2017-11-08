@@ -8,6 +8,7 @@ class CommentController < ApplicationController
 		comment.search_page = params[:page]
 		comment.save
 		redirect_to :back
+		flash[:notice] = "Comment successfully posted."
  	end
 
 

@@ -63,6 +63,7 @@ class DocumentsController < ApplicationController
       #xml_to_html(@new_text.content_html)
       @new_text.save
       redirect_to doc_path
+      flash[:notice] = "Document successfully edited!"
     else
       redirect_to new_user_session_path, :alert => "Not logged in or Insufficient rights!"
     end

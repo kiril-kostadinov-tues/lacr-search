@@ -74,7 +74,6 @@ class DocumentsController < ApplicationController
       and params[:p].to_i > 0 and  params[:p].to_i < 1000000
       # Store the volume and page from the input
       @volume, @page = params[:v].to_i, params[:p].to_i
-
       if params[:searchID]
         @searchID = 'searchID'
       end

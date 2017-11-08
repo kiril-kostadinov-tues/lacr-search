@@ -20,7 +20,6 @@
     <%else%>
     <div class="col-xs-12 text-right">
       <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
-
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>

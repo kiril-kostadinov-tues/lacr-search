@@ -36,6 +36,7 @@ Rails.application.routes.draw do
   get 'ajax/search/autocomplete', to: 'search#autocomplete'
   get 'ajax/search/autocomplete-entry', to: 'search#autocomplete_entry'
   get 'ajax/search/chart/worddate', to: 'search#chart_wordstart_date'
+  get 'ajax/search/chart/data', to: 'search#chart_data'
 
   # Search routes
   get 'search', to: 'search#search'

@@ -62,7 +62,9 @@ class SearchController < ApplicationController
       ).pluck(:date, :entry)
 
       results.each do |r|
-        r[0] = r[0].slice!(0..3)
+        if !r[0].nil?
+          r[0] = r[0].slice!(0..3)
+        end
       end
 
       data = results.group_by {|year, record| year}.map {|year, match| [year, match.count]}

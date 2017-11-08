@@ -1,12 +1,7 @@
 //= require highlightRegex.min.js
 
 var chartData = [];
-<<<<<<< HEAD
-<<<<<<< HEAD
-var pieData = []
-=======
-=======
->>>>>>> origin/gallery
+var pieData = [];
 
 function toggle_gallery () {
   if ($('#gallery').css('visibility') === 'hidden') {
@@ -22,10 +17,6 @@ function toggle_gallery () {
       
 }
 
-<<<<<<< HEAD
->>>>>>> af1b736... Added option to view results in the form of a gallery
-=======
->>>>>>> origin/gallery
 var loadChart = function (chartAPI) {
   chartAPI = (chartAPI !== 'undefined') ? chartAPI : "";
 

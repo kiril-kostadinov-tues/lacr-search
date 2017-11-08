@@ -33,12 +33,27 @@
           </div>
 
           <%= render "home/social_media" %>
-          <%= link_to "Edit Document", doc_edit_path(:id => document.id), :method => :post %>  
+          <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>  
 				</div>
 			</div> <!-- panel-body -->
 		</div> <!-- panel panel-primary -->
-  <% end %>
-
+	<% end %>
+	<% if user_signed_in? %>
+	 		<%= form_tag('/post', method:"post")  do%>
+	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+	 			<input type="hidden" name="volume" value="<%= @volume %>" />
+	 			<input type="hidden" name="page" value="<%= @page %>" />
+	 			<textarea name="content" id="content" placeholder="Comment..." cols="40" rows="4"></textarea>
+	 			<input type="submit" name="submit" value="Add Comment">
+	 		<% end %>
+	 	<% end %>
+	 	<% @comments.each do |comment|%>
+	 		<div>
+	 			<h3><%= comment.user.email %></h3>
+	 			<h5><%= comment.created_at %></h5>
+	 			<p><%= comment.content %></p>
+	 		</div>
+ 	<% end %>
 </div> <!-- col-md-6 -->
 <!-- End of the left side -->
 

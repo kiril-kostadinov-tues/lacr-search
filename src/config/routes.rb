@@ -42,4 +42,8 @@ Rails.application.routes.draw do
   get 'search', to: 'search#search'
   get 'query', to: 'xquery#index'
   post 'query', to: 'xquery#show'
+
+  # Semantic search routes
+  get 'semantic_search', to: 'semantic_search#index'
+  post 'semantic_search', to: 'semantic_search#show'
 end

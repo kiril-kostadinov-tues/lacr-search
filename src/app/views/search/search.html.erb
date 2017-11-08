@@ -12,26 +12,19 @@
     </div>
     <div class="col-xs-6 text-right">
       <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
-<<<<<<< HEAD
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();loadPieData();">Toggle Charts</button>
-=======
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
       <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
->>>>>>> af1b736... Added option to view results in the form of a gallery
     </div>
     <%else%>
     <div class="col-xs-12 text-right">
       <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
-<<<<<<< HEAD
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();loadPieData();">Toggle Charts</button>
-=======
+
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
       <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
->>>>>>> af1b736... Added option to view results in the form of a gallery
     </div>
     <%end%>
     

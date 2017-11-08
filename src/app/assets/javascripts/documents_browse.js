@@ -1,6 +1,20 @@
 //= require ISO_639_2.min.js
 var $selected = {};
 
+function toggle_gallery () {
+  if ($('#gallery').css('visibility') === 'hidden') {
+    $('#doc-browse').fadeToggle();
+    $('#gallery').css('visibility', 'visible');
+    $('#gallery').css('height', 'auto');
+    $(window).trigger('resize');
+  } else {
+    $('#gallery').fadeToggle();
+    $('#doc-browse').fadeToggle();
+    $(window).trigger('resize');
+  }
+      
+}
+
 function download_zip(img){
   img = (img !== 'undefined') ? img : false;
   var n;
@@ -210,6 +224,7 @@ $(document).ready(function() {
     $('#doc_download').click(function(){download_zip();});
     $('#doc_download_img').click(function(){download_zip(img="jpeg");});
     $('#doc_download_img_orig').click(function(){download_zip(img="tiff");});
+    $('#toggle-gallery').click(function(){toggle_gallery();});
 
 
     $('#doc_delete').click(function() {

@@ -21,3 +21,5 @@
 //= require js.cookie.js
 //= require ISO_639_2.min.js
 //= require init.js
+//= require init.js
+//= require turn.min.js

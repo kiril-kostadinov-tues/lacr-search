@@ -40,7 +40,7 @@
 	$(document).ready(function() {
 		<% if params[:highlight] %>
 		setTimeout(function () {
-			// Heighlight search words
+			// Highlight search words
 			highlighted_options = { wordsOnly: true, caseSensitive: true };
 			$('.transcription').highlight(<%= params[:highlight].split().to_s.html_safe %>, highlighted_options);
 		}, 1000);

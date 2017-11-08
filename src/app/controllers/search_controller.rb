@@ -174,7 +174,22 @@ class SearchController < ApplicationController
 
   def get_search_tools_params(permited)
     # Get text from the user input. In case of empty search -> use '*'
+    en_to_lat = Hash.new
+    en_to_lat["begin"] = "incipiunt"
+    en_to_lat["feast"] = "festum"
+    en_to_lat["before"] = "ante"
+    en_to_lat["aberdeen"] = "aberdene"
+
+ 
     @query = permited[:q].present? ? permited[:q].strip : '*'
+    arr_query = @query.split
+    arr_query.each_with_index do |word, index|
+	if en_to_lat.key?(word.downcase)
+		arr_query[index] = en_to_lat[word.downcase]
+	end
+    end
+
+    @query = arr_query.join(' ')
 
     # Get the number of results per page; Default value -> 5
     @results_per_page = 5

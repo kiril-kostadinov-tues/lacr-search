@@ -120,6 +120,7 @@ class DocumentsController < ApplicationController
           @document_image_normal = page_image.image.normal.url.split('.')[0...-1].join + '.jpeg'
           @document_image_large = page_image.image.large.url.split('.')[0...-1].join + '.jpeg'
         end
+	@fist = "feast"
         respond_to do |format|
          format.html { render :partial => "documents/page" }
         end

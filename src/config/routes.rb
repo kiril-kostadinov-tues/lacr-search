@@ -42,4 +42,6 @@ Rails.application.routes.draw do
   get 'search', to: 'search#search'
   get 'query', to: 'xquery#index'
   post 'query', to: 'xquery#show'
+
+  post 'post', to: 'comment#post'
 end

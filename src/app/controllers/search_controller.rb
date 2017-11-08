@@ -63,6 +63,15 @@ class SearchController < ApplicationController
             order: get_order_by(permited), # Parse order_by parameter
             load: false # Do not retrieve data from PostgreSQL
 
+        @images = []
+    
+        @documents.each do |document|
+          image = PageImage.find_by_volume_and_page(document.volume, document.page)
+          if image
+            @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+          end
+        end
+
     else
       @documents = Search.search @query,
           misspellings: {edit_distance: @misspellings,transpositions: false},
@@ -74,6 +83,15 @@ class SearchController < ApplicationController
           fields: ['content'], # Search for the query only within content
           suggest: true, # Enable suggestions
           load: false # Do not retrieve data from PostgreSQL
+    
+      @images = []
+    
+      @documents.each do |document|
+        image = PageImage.find_by_volume_and_page(document.volume, document.page)
+        if image
+          @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+        end
+      end
     end
   end
 

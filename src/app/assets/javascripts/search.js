@@ -1,6 +1,21 @@
 //= require highlightRegex.min.js
 
 var chartData = [];
+
+function toggle_gallery () {
+  if ($('#gallery').css('visibility') === 'hidden') {
+    $('#res').fadeToggle();
+    $('#gallery').css('visibility', 'visible');
+    $('#gallery').css('height', 'auto');
+    $(window).trigger('resize');
+  } else {
+    $('#gallery').fadeToggle();
+    $('#res').fadeToggle();
+    $(window).trigger('resize');
+  }
+      
+}
+
 var loadChart = function (chartAPI) {
   chartAPI = (chartAPI !== 'undefined') ? chartAPI : "";
 
@@ -72,3 +87,5 @@ $(function() {
     $('.list-group-item').highlightRegex(new RegExp($("input.simple-search").val(), "ig"));
   }
 });
+
+$('#toggle-gallery').click(function(){toggle_gallery();});

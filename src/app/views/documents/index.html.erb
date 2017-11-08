@@ -14,6 +14,9 @@
       </ul>
     </div>
 
+    <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-primary">
+      <%= fa_icon "eye", text: "Toggle Gallery" %>
+    </button>
     <% if user_signed_in? and current_user.admin? %>
     <button type="button" name="delete" id="doc_delete" class="btn btn-danger doc-tools" disabled="disabled">
       <%= fa_icon "remove", text: "Delete"%>
@@ -51,7 +54,23 @@
   </div>
 </div>
 
+<div id="gallery" class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6" style="visibility: hidden; height: 0">
+  <div id="flipbook">
+    <% @images.each do |image| %>
+      <%= image_tag(image) %>
+    <% end %>
+  </div>
+</div>
+
 <iframe id="file_download" style="display:none;"></iframe>
+
+<script>
+  $("#flipbook").turn({
+    width: 800,
+    height: 600,
+    autoCenter: true
+  });
+</script>
 
 <% content_for :javascript_includes do %>
   <%= javascript_include_tag "documents_browse.js" %>

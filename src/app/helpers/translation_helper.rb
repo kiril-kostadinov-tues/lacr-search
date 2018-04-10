@@ -1,0 +1,2 @@
+module TranslationControllerHelper
+end

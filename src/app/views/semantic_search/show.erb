@@ -1,4 +1,7 @@
 <div class="container">
 	<p>Search returned <%=@number_of_results %> results</p>
-  	<pre><code><%=@query_result%></code></pre>
+  	<pre><code><% @offenceentries.each do |item| %>
+  	<%= item %><br>
+  	<% end %>
+  	</code></pre>
 </div>

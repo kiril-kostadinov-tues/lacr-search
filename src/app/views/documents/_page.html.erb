@@ -34,6 +34,7 @@
 
           <%= render "home/social_media" %>
           <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>  
+          <%= link_to "Add Paragraph Semantics", page_semantic_path(:id => document.id, :p => @page, :v => @volume), class: "btn btn-primary", :method => :get %>  
 				</div>
 			</div> <!-- panel-body -->
 

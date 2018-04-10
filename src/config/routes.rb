@@ -46,5 +46,21 @@ Rails.application.routes.draw do
   
   # Semantic search routes
   get 'semantic_search', to: 'semantic_search#index'
-  post 'semantic_search', to: 'semantic_search#show'
+  post 'semantic_search_page', to: 'semantic_search#show'
+  post 'semantic_search_word', to: 'semantic_search#show_word'
+  get 'word_semantic', to: 'semantic_search#show_word_semantic'
+  post 'word_semantic', to: 'semantic_search#word_semantic'
+  get 'page_semantic', to: 'semantic_search#show_page_semantic'
+  patch 'page_semantic', to: 'semantic_search#page_semantic_patched'
+  post 'semantic_search/create', to: 'semantic_search#create'
 end
+
+
+#<%= form_for @documents, url: {action: "page_semantic_patched"} do |f| %>
+ # Offence <%= f.select_tag(:offence, options_for_select([['Arsony', 'arsony'],['Huinq', 'huinq']]), {include_blank: true}) %>
+ # Verdict <%= f.select_tag(:verdict, options_for_select([['Sentenced', 'sentenced'],['Huinq', 'huinq']]), {include_blank: true}) %>
+ # Sentence <%= f.select_tag(:sentence, options_for_select([['Death', 'death'],['Huinq', 'huinq']]), {include_blank: true}) %>
+ # <%= f.hidden_field_tag :page, @page%>
+ # <%= f.hidden_field_tag :volume, @volume %>
+#  <%= f.submit "Submit" %>s
+#<% end %>

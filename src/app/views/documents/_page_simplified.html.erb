@@ -1,3 +1,4 @@
+
 <div class="col-md-12">
 
   <% @documents.each do |document| %>
@@ -31,10 +32,19 @@
           <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
         </div>
         <%= render "home/social_media" %>
-        <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>     	
-                 
+        <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+          <%= link_to "Add Paragraph Semantics", page_semantic_path(:id => document.id, :p => @page, :v => @volume), class: "btn btn-primary", :method => :get %>      
+
+        <form action="word_semantic" method = "get" onsubmit="gosho()">
+		  <input type ="hidden" name = "maikatiputkata" class= "ne" >
+		  <input type ="hidden" name = "v" value = "<%=document.volume %>" >
+		  <input type ="hidden" name = "p" value = "<%=document.page%>" >
+		  <input type="hidden" name="id" value = "<%=document.id%>" >
+		  <input type = "submit" value="Add Word Annotation">
+</form>
       </div>
 		</div> <!-- panel panel-primary -->
+
   <% end %>
 </div> <!-- col-md-6 -->
 

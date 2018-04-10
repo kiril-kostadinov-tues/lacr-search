@@ -1,8 +1,13 @@
 <div class="container">
 	<h1>Choose an entity to search for</h1>
 
-	<%= form_tag(semantic_search_path, :method => "post") do %>
-	<%= select_tag("term", options_for_select(["legal-vocabulary", "time", "number", "person", "first-name", "surname", "relationship", "place", "general-office", "election"]), class:"form-control")%>
-	<%= submit_tag "Search", class: "btn btn-primary" %>
+	<%= form_tag(semantic_search_page_path, :method => "post") do %>
+	<%= select_tag("term", options_for_select(["Arsony","Murder"]), class:"form-control")%>
+	<%= submit_tag "Search for Sentence", class: "btn btn-primary" %>
+	<% end %>
+
+	<%= form_tag(semantic_search_word_path, :method => "post") do %>
+	<%= select_tag("term", options_for_select(["John Dough"]), class:"form-control") %>
+	<%= submit_tag "Search for Annotation", class: "btn btn-primary" %>
 	<% end %>
 </div>

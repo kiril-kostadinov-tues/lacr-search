@@ -9,7 +9,7 @@ class DocumentsController < ApplicationController
     @documents.each do |document|
       image = PageImage.find_by_volume_and_page(document.volume, document.page)
       if image
-        @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+        @images << [image.image.normal.url.split('.')[0...-1].join + '.jpeg', document.volume, document.page]
       end
     end
   end

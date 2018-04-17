@@ -57,7 +57,11 @@
 <div id="gallery" class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6" style="visibility: hidden; height: 0">
   <div id="flipbook">
     <% @images.each do |image| %>
-      <%= image_tag(image) %>
+      <div>
+        <a href="/doc/show?p=<%= image[2] %>&v=<%= image[1] %>">
+          <%= image_tag(image[0], style: "max-width:100%;max-height:100%;") %>
+        </a>
+      </div>
     <% end %>
   </div>
 </div>
@@ -67,7 +71,7 @@
 <script>
   $("#flipbook").turn({
     width: 800,
-    height: 600,
+    height: 528,
     autoCenter: true
   });
 </script>

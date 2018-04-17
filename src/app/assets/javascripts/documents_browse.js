@@ -4,11 +4,13 @@ var $selected = {};
 function toggle_gallery () {
   if ($('#gallery').css('visibility') === 'hidden') {
     $('#doc-browse').fadeToggle();
+    $('#doc-title').hide();
     $('#gallery').css('visibility', 'visible');
     $('#gallery').css('height', 'auto');
     $(window).trigger('resize');
   } else {
     $('#gallery').fadeToggle();
+    $('#doc-title').show();
     $('#doc-browse').fadeToggle();
     $(window).trigger('resize');
   }

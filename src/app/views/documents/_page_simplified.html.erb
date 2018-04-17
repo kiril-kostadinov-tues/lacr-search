@@ -24,7 +24,7 @@
 			</div>  <!-- panel-heading -->
 			<div class="panel-body">
 				<pre class="prettyprint transcription" style="display: none;"><code class="language-xml"><%= document.tr_paragraph.content_xml.gsub(/^\s+/, ' ')%></code></pre>
-				<div class="transcription tr-text"><%= document.tr_paragraph.content_html.html_safe %></div>
+				<div class="transcription tr-text"><%= document.tr_paragraph.content_html.html_safe.gsub(/(?!<a[^>]*)([\w|-]+)(?![^<]*>)/) { |word| '<span class="word" tabindex="-1" data-toggle="popover">' + word + '</span>'}.html_safe %></div>
 			</div> <!-- panel-body -->
       <div class="panel-footer">
         <div class="checkbox">

@@ -74,6 +74,7 @@ function show_browser(){
 
 function load_document (p, v){
   $('#doc-title').html("Volume: "+v+" Page: "+p);
+  $('.word').popover('hide');
   $("#transcriptions").load("/doc/page-s?p="+p+"&v="+v, function(responseTxt, statusTxt, xhr){
         if(statusTxt == "success"){
           // Transform language codes
@@ -89,6 +90,16 @@ function load_document (p, v){
   $('#doc_view').css('display', 'inline-block');
   $('div.active').removeClass("active");
   $('#vol-'+v+'-page-'+p).addClass("active");
+  setTimeout(function () {
+    $(".word").popover({'title': function () {
+      return getTitle(this);
+    }, 
+    'content': function () {
+      return getTranslation(this);
+    }, 
+    'html': true,
+    'container': 'body'});  
+  }, 1000);
 }
 
 function Download(url) {

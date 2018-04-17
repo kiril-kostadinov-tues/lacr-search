@@ -45,11 +45,7 @@
 	}
 
 	submitTranslation = function (word, language) {
-		console.log(word);
-		console.log(language);
-
 		translation = $("#input-meaning").val();
-		console.log(translation);
 
 		$.ajax({type: "POST", url: '/ajax/translate/modify/' + language + '/' + word, data: {translated: translation}, success: function (result) {
 			$('#input-meaning').val(translation);
@@ -61,7 +57,6 @@
 	}
 
 	getTitle = function (src) {
-		console.log(src);
 		return $(src).text();
 	};
 
@@ -75,7 +70,6 @@
 
 		res = $.ajax({url: '/ajax/translate/get/' + language + '/' + word, success: function (result) {
 			setTimeout(function () {
-				console.log(result);
 
 				if(result === null) {
 					$("#result").text("No translation available")
@@ -86,7 +80,15 @@
 			}, 300);
 		}});
 
-		markup = '<div><div id="meaning"><p id="result"></p></div><div id="actions"><button type="button" class="btn btn-link" onclick="showEditForm()">Add/Edit Translation</button><a target="_blank" href="';
+		markup = '<div><div id="meaning"><p id="result"></p></div><div id="actions">';
+
+		<% if user_signed_in? %>
+			<% if current_user.admin %>
+				markup += '<button type="button" class="btn btn-link" onclick="showEditForm()">Add/Edit Translation</button>';
+			<% end %>
+		<% end %> 
+
+		markup += '<a target="_blank" href="';
 
 		if(language === "scots") {
 			markup += 'http://www.dsl.ac.uk/results/' + word;
@@ -96,11 +98,20 @@
 			markup += 'https://translate.google.com/#nl/en/' + word;
 		}
 
-        markup += '">Check Online</a></div><div id="add-new" style="display: none"><input type="text" name="meaning" class="form-control" id="input-meaning"><br><button type="button" class="btn btn-primary" onclick="submitTranslation(\'';
+        markup += '">Check Online</a></div>';
 
-        markup += word + '\', \'' + language
+        <% if user_signed_in? %>
+			<% if current_user.admin %>
+				markup += '<div id="add-new" style="display: none"><input type="text" name="meaning" class="form-control" id="input-meaning"><br><button type="button" class="btn btn-primary" onclick="submitTranslation(\'';
 
-        markup += '\')">Submit</button></div></div>'
+
+       			markup += word + '\', \'' + language;
+
+        		markup += '\')">Submit</button></div>';
+			<% end %>
+		<% end %> 
+
+		markup += '</div>';
 
 		return markup;
 	};
@@ -129,19 +140,6 @@
 					}, 0);
 			});
 		});
-		setTimeout(function () {
-			console.log("Kurec");
-			console.log($().jquery);
-			$(".word").popover({'title': function () {
-				return getTitle(this);
-			}, 
-			'content': function () {
-				return getTranslation(this);
-			}, 
-			'html': true,
-			'container': 'body'});
-			console.log("Dickec");	
-		}, 3000);
 	});
 	</script>
 <% end %>

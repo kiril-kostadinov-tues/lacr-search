@@ -9,20 +9,23 @@ class TranslationController < ApplicationController
 	end
 
 	def edit 
-		translated = params[:translated]
-		word = params[:word]
-		language = params[:lang]
+		if user_signed_in? and current_user.admin?
+			translated = params[:translated]
+			word = params[:word]
+			language = params[:lang]
 
-		tr = Translation.find_by word: word, language: language
+			tr = Translation.find_by word: word, language: language
 
-		if tr.nil?
-			tr = Translation.new
-			tr.word = word
-			tr.language = language
-		end
+			if tr.nil?
+				tr = Translation.new
+				tr.word = word
+				tr.language = language
+			end
 
-		tr.translated = translated
-		tr.save
+			tr.translated = translated
+			tr.save
+		else
+	      redirect_to new_user_session_path, :alert => "Not logged in or Insufficient rights!"
+	    end
 	end
-
 end

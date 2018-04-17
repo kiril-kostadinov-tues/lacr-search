@@ -59,8 +59,9 @@ class DocumentsController < ApplicationController
       @new_text.content_xml = xml
       @new_text.save
       @new_text = TrParagraph.find(params[:edited_document_id])
-      @new_text.content_html = Nokogiri::XML(xml)
-      #xml_to_html(@new_text.content_html)
+      new_html = Nokogiri::XML(xml)
+      xml_to_html(new_html)
+      @new_text.content_html = new_html
       @new_text.save
       redirect_to doc_path
       flash[:notice] = "Document successfully edited!"

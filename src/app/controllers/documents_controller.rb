@@ -17,7 +17,8 @@ class DocumentsController < ApplicationController
   def selected
     selected_entries = cookies[:selected_entries]
     if selected_entries
-      @documents = Search.where({entry: selected_entries.split(',')})
+      @documents = Search.where({entry: selected_entries.split(',')}).order(:date)
+      @exclude_comments = true
       if @documents.length == 0
         cookies.delete :selected_entries
         redirect_to doc_path, :alert => "No selected paragraphs!"

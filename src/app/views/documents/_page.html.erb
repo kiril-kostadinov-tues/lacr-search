@@ -40,6 +40,7 @@
 		</div> <!-- panel panel-primary -->
 	<% end %>
 	<% if user_signed_in? %>
+		<% unless @exclude_comments %>
 	 		<%= form_tag('/post', method:"post")  do%>
 	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
 	 			<input type="hidden" name="volume" value="<%= @volume %>" />
@@ -47,13 +48,16 @@
 	 			<textarea name="content" id="content" placeholder="Comment..." cols="40" rows="4"></textarea>
 	 			<input type="submit" name="submit" value="Add Comment">
 	 		<% end %>
-	 	<% end %>
+ 		<% end %>
+ 	<% end %>
+	 <% unless @exclude_comments %>
 	 	<% @comments.each do |comment|%>
 	 		<div>
 	 			<h3><%= comment.user.email %></h3>
 	 			<h5><%= comment.created_at %></h5>
 	 			<p><%= comment.content %></p>
 	 		</div>
+	 	<% end %>
  	<% end %>
 </div> <!-- col-md-6 -->
 <!-- End of the left side -->

@@ -47,4 +47,9 @@ Rails.application.routes.draw do
   # Semantic search routes
   get 'semantic_search', to: 'semantic_search#index'
   post 'semantic_search', to: 'semantic_search#show'
+
+  post 'notes/create', to: 'note#create'
+  get '/notes', to: 'note#index'
+
+  delete 'notes/:id', to: 'note#destroy'
 end

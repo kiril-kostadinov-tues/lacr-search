@@ -23,38 +23,71 @@
           <%end%>
 				</div> <!-- row -->
 			</div>  <!-- panel-heading -->
-			<div class="panel-body">
-				<pre class="prettyprint transcription" style="display: none;"><code class="language-xml"><%= document.tr_paragraph.content_xml.gsub(/^\s+/, ' ')%></code></pre>
-				<div class="transcription tr-text" id="content"><%= document.tr_paragraph.content_html.html_safe%></div>
-				<div class="panel-footer">
-          <button class="btn btn-default btn-sm" onclick="toggle_xml(this);">XML</button>
-          <div class="checkbox" style="display: inline-block; float: inline-end;">
-            <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
-          </div>
+		<div class="panel-body">
+			<pre class="prettyprint transcription" style="display: none;"><code class="language-xml"><%= document.tr_paragraph.content_xml.gsub(/^\s+/, ' ')%></code></pre>
+			<div class="transcription tr-text" id="content"><%= document.tr_paragraph.content_html.html_safe%></div>
+			<div class="panel-footer">
+	          <button class="btn btn-default btn-sm" onclick="toggle_xml(this);">XML</button>
+	          <div class="checkbox" style="display: inline-block; float: inline-end;">
+	            <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
+	          </div>
 
-          <%= render "home/social_media" %>
-          <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>  
+	          	<%= render "home/social_media" %>
+	          	<%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+	 			
+	 			<%= form_tag('/notes/create', method:"post")  do %>
+	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+	 			<input type="hidden" name="volume" value="<%= @volume %>" />
+	 			<input type="hidden" name="page" value="<%= @page %>" />
+	 			<input type="hidden" name="paragraph" value="<%= document.id %>" />
+	 			<textarea name="content" id="content" placeholder="Note..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
+	 			<div><input type="submit" name="submit" value="Add Note"></div>
+	 			<% end %>
+
+			 	<div align="right">
+				 	<% if user_signed_in? %>
+				 		<% @notes.each do |note|%>
+						 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
+						 		<%= note.content %>
+						 		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
+						 			<input type="submit" value="Delete" class="btn btn-danger"> 
+						 		<% end %>
+						 	<% end %>
+					 	<% end %>
+					<% end %>
 				</div>
-			</div> <!-- panel-body -->
+
+			</div>
+		</div> <!-- panel-body -->
 
 		</div> <!-- panel panel-primary -->
 	<% end %>
+	
+
 	<% if user_signed_in? %>
-	 		<%= form_tag('/post', method:"post")  do%>
+		<div class="col-sm-4">
+	 		<%= form_tag('/post', method:"post")  do %>
 	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
 	 			<input type="hidden" name="volume" value="<%= @volume %>" />
 	 			<input type="hidden" name="page" value="<%= @page %>" />
 	 			<textarea name="content" id="content" placeholder="Comment..." cols="40" rows="4"></textarea>
-	 			<input type="submit" name="submit" value="Add Comment">
+	 			<div><input type="submit" name="submit" value="Add Comment"></div>
 	 		<% end %>
-	 	<% end %>
-	 	<% @comments.each do |comment|%>
-	 		<div>
-	 			<h3><%= comment.user.email %></h3>
-	 			<h5><%= comment.created_at %></h5>
-	 			<p><%= comment.content %></p>
-	 		</div>
+	 	</div>
+	<% end %>
+ 	
+ 	<% @comments.each do |comment|%>
+ 		<div>
+ 			<h3><%= comment.user.email %></h3>
+ 			<h5><%= comment.created_at %></h5>
+ 			<p><%= comment.content %></p>
+ 		</div>
  	<% end %>
+
+ 	
+
+ 	
+
 </div> <!-- col-md-6 -->
 <!-- End of the left side -->
 

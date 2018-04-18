@@ -109,10 +109,11 @@ class DocumentsController < ApplicationController
       and params[:v].to_i > 0 and  params[:v].to_i < 1000000 \
       and params[:p].to_i > 0 and  params[:p].to_i < 1000000
       # Store the volume and page from the input
-      @volume, @page = params[:v].to_i, params[:p].to_i
+      @volume, @page, @paragraph = params[:v].to_i, params[:p].to_i, params[:paragraph].to_i
       # Select Documents
       @documents = Search.order(:paragraph).where('volume' => @volume).rewhere('page' => @page)      
       @comments = Comment.where("search_volume = ? AND search_page = ?", @volume, @page)
+      @notes = Note.where("search_volume = ? AND search_page = ?", @volume, @page)
       if @documents.length > 0
         # Select image
         page_image = PageImage.find_by_volume_and_page(@volume, @page)

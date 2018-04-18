@@ -1,0 +1,5 @@
+<% @usrnote.each do |note| %>
+	<span>Comment Volume: <%= note.search_volume %></span>
+	<span>Comment Page: <%= note.search_page %></span>
+	<p><%= note.content %></p>
+<% end %>

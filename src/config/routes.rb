@@ -52,4 +52,5 @@ Rails.application.routes.draw do
   get '/notes', to: 'note#index'
 
   delete 'notes/:id', to: 'note#destroy'
+  delete 'comments/:id', to: 'comment#destroy'
 end

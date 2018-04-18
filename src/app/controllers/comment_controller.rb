@@ -11,5 +11,15 @@ class CommentController < ApplicationController
 		flash[:notice] = "Comment successfully posted."
  	end
 
+ 	def destroy
+ 		comment = Comment.where(id: [params[:id].to_i]).first
+ 		if user_signed_in?
+ 			if current_user.id == comment.user_id
+ 				comment.destroy
+ 				redirect_to :back
+ 			end
+ 		end
+ 	end
+
 
 end

@@ -1,5 +1,23 @@
 <% @usrnote.each do |note| %>
-	<span>Comment Volume: <%= note.search_volume %></span>
-	<span>Comment Page: <%= note.search_page %></span>
-	<p><%= note.content %></p>
+	
+	<style>
+		h4.a {
+		    border-width:3px; 
+		    border-style:groove;
+		}
+		h3.a {
+    		white-space: nowrap;
+		}
+	</style>
+
+	<h3 class="a">
+		Note Volume: <%= note.search_volume %>,
+		Note Page: <%= note.search_page %>
+		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
+			<input type="submit" value="Delete" class="btn btn-danger"> 
+		<% end %>
+	</h3>
+
+	<h4 class="a"><%= note.content %></h4>
+
 <% end %>

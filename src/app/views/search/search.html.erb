@@ -15,7 +15,7 @@
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Charts</button>
     </div>
     <%else%>
     <div class="col-xs-12 text-right">
@@ -23,7 +23,7 @@
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Charts</button>
     </div>
     <%end%>
     
@@ -32,10 +32,35 @@
 <%end%>
 <% if @documents_page.length > 0 %>
   <div class="row">
-    <div class="text-center">
-       <div id="chart-1" style="visibility: hidden; height: 0"></div>
-       <div id="pie-chart" style="visibility: hidden; height: 0"></div>
-       <div id="bar-chart" style="visibility: hidden; height: 0"></div>
+    <div id="chart-tabs" class="text-center" style="visibility: hidden;">
+      <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link" id="histogram-tab" data-toggle="tab" href="#histogram" role="tab" aria-controls="histogram" aria-selected="false">
+            Histogram
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pie-chart-tab" data-toggle="tab" href="#pieChart" role="tab" aria-controls="pieChart" aria-selected="false">
+            Pie Chart
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="timeline-tab" data-toggle="tab" href="#timeline" role="tab" aria-controls="timeline" aria-selected="true">
+            Timeline
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade" id="histogram" role="tabpanel" aria-labelledby="histogram-tab">
+          <div id="bar-chart" style="visibility: hidden; height: 0"></div>      
+        </div>
+        <div class="tab-pane fade" id="pieChart" role="tabpanel" aria-labelledby="pie-chart-tab">
+          <div id="pie-chart" class="col-md-offset-4" style="visibility: hidden; height: 0"></div>
+        </div>
+        <div class="tab-pane fade show" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
+          <div id="chart-1" style="visibility: hidden; height: 0"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="res" class="list-group">
@@ -119,8 +144,8 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <%= javascript_include_tag "search.js" %>
   <script type="text/javascript">
-    loadChart('<%= ajax_search_chart_worddate_path(:term => @query)%>');
-    loadPieData('<%= ajax_search_chart_data_path(:term => @query)%>');
+    loadChart('<%= ajax_search_chart_worddate_path(:term => @queries.join(", "))%>');
+    loadPieData('<%= ajax_search_chart_data_path(:term => @queries.join(", "))%>');
   </script>
 <%end%>
 <%end%>

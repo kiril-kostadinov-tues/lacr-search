@@ -31,6 +31,7 @@ var loadChart = function (chartAPI) {
           {
             var row = data[i];
             newRow = row.slice(0, 3);
+            console.log(newRow[0])
             newRow.push(new Date(row[3]));
             newRow.push(new Date(row[4]));
             chartData[i] = newRow;
@@ -66,6 +67,9 @@ var loadChart = function (chartAPI) {
 
       chart.draw(dataTable, options);
 
+
+      $("#chart-tabs").css('visibility', 'visible');
+      $("#histogram-tab").tab("show");
       $('#chart-1').css('visibility', 'visible');
       $('#chart-1').css('height', 'auto');
       $(window).trigger('resize');
@@ -109,6 +113,7 @@ var loadChart = function (chartAPI) {
     }; drawBar();
   }
   else {
+    $("#chart-tabs").fadeToggle();
     $('#chart-1').fadeToggle();
     $('#pie-chart').fadeToggle();
     $('#bar-chart').fadeToggle();

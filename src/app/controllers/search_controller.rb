@@ -4,13 +4,16 @@ class SearchController < ApplicationController
 
   def chart_wordstart_date
     if params[:term]
-      # Strip white-space at the beginning and the end.
-      query = params[:term].strip.gsub(/[^0-9a-z]/i, '')
+      term = params[:term]
+      parts = term.split(", ")
 
-      # Do not use autocomplete for phrases; The search method is not appropriate
-      # if query.length < 20 and !query.include? ' '
-         render json: (
-          Search.search(query, {
+      data = []
+
+      parts.each do |part|
+        # Strip white-space at the beginning and the end.
+        query = part.gsub(/[^0-9a-z]/i, '')
+
+        docs = Search.search(query, {
              fields: ['content'], # Autocomplete for words in content
              match: :word_start, # Use word_start method
              highlight: {tag: "" ,
@@ -22,22 +25,25 @@ class SearchController < ApplicationController
                below: 4, # Do not use misspellings if there are more than 4 results
                transpositions: false # Show more accurate results
              }
-           }
-          # Get only the highlighted word
-          # Remove non-aplhanumeric characters, such as white-space
-          # Return only unique words
-          ).pluck(:highlighted_content, :date, :entry)
+           })
+
+        data += docs.results
+      end
+      
+
+      # Do not use autocomplete for phrases; The search method is not appropriate
+      # if query.length < 20 and !query.include? ' '
+         render json: data.pluck(:highlighted_content, :date, :entry)
            .delete_if{|content, date, entry| not content or not date or not entry}
            .collect{
              |content, date, entry| [
-               content.gsub(/[^0-9a-z]/i, ''),
+               content.gsub(/[^0-9a-z]/i, '').downcase,
                '',
                "<span style=\"margin:5px;\"><b>ID:</b> #{entry}</span><br><span style=\"margin:5px;\"><b>Date:</b> #{date}</span>",
                date,
                date
                ]
              }
-        )
        return # Finish here to avoid render {}
       # end
     end
@@ -46,9 +52,15 @@ class SearchController < ApplicationController
 
   def chart_data
     if params[:term]
-      query = params[:term].strip.gsub(/[^0-9a-z]/i, '')
+      term = params[:term]
+      parts = term.split(", ")
 
-      results = Search.search(query, {
+      data = []
+
+      parts.each do |part|
+        query = part.strip.gsub(/[^0-9a-z]/i, '')
+
+        docs = Search.search(query, {
           fields: ['content'], # Autocomplete for words in content
           match: :word_start, # Use word_start method
           highlight: {tag: "" ,
@@ -60,8 +72,12 @@ class SearchController < ApplicationController
             below: 4, # Do not use misspellings if there are more than 4 results
             transpositions: false # Show more accurate results
           }
-        }
-      ).pluck(:date, :entry)
+        })
+
+        data += docs.results
+      end
+
+      results = data.pluck(:date, :entry)
 
       results.each do |r|
         if !r[0].nil?
@@ -69,8 +85,8 @@ class SearchController < ApplicationController
         end
       end
 
-      data = results.group_by {|year, record| year}.map {|year, match| [year, match.count]}
-      render json: (data)
+      final_data = results.sort_by{|r| r[0]}.group_by {|year, record| year}.map {|year, match| [year, match.count]}
+      render json: (final_data)
       return      
     end
     render json: {}
@@ -107,6 +123,8 @@ class SearchController < ApplicationController
         end
 
     else
+      @queries = [@query]
+
       @documents = Search.search @query,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -118,6 +136,7 @@ class SearchController < ApplicationController
           load: false # Do not retrieve data from PostgreSQL
     
       if @query_lat != ""
+        @queries << @query_lat
         @documents_lat = Search.search @query_lat,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -129,6 +148,7 @@ class SearchController < ApplicationController
       end
 
       if @query_sc != ""
+        @queries << @query_sc
         @documents_sc = Search.search @query_sc,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -140,6 +160,7 @@ class SearchController < ApplicationController
       end
 
       if @query_d != ""
+        @queries << @query_d
         @documents_d = Search.search @query_d,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters

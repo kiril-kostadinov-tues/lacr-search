@@ -44,7 +44,7 @@
 	 			<div><input type="submit" name="submit" value="Add Note"></div>
 	 			<% end %>
 
-			 	<div align="right">
+			 	<div align="left">
 				 	<% if user_signed_in? %>
 				 		<% @notes.each do |note|%>
 						 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
@@ -64,38 +64,48 @@
 	<% end %>
 	
 
-	<% if user_signed_in? %>
-		<div>
-	 		<%= form_tag('/post', method:"post")  do %>
-	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
-	 			<input type="hidden" name="volume" value="<%= @volume %>" />
-	 			<input type="hidden" name="page" value="<%= @page %>" />
-	 			<textarea name="content" id="content" placeholder="Comment..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
-	 			<div><input type="submit" name="submit" value="Add Comment"></div>
-	 		<% end %>
-	 	</div>
-	<% end %>
-
  	<div>
 	 	<% @comments.each do |comment|%>
 	 		<style>
 				p.a {
 				    border-width:3px; 
 				    border-style:groove;
+				    border-radius: 10px;
+				}
+				h3.b {
+    				white-space: nowrap;
 				}
 			</style>
+
 	 		<div>
-	 			<h3><%= comment.user.email %></h3>
-	 			<h5>Posted at: <%= comment.created_at %></h5>
-	 			<p class="a"><%= comment.content %></p>
+	 			<h3 class="b">
+		 			User: <%= comment.user.email %>
+		 			Posted at: <%= comment.created_at %>	
+	 			</h3>
+	 			<span style='border:1px black solid; font-size:20px;'>"<%= comment.content %>"</span>
 	 		</div>
 	 		<% if comment.user_id == current_user.id%>
 		 		<%= form_tag("/comments/#{comment.id}", method:"delete") do %>
-					<input type="submit" value="Delete" class="btn btn-danger">
+					<input type="submit" value="Delete your comment" class="btn btn-danger">
 			<% end %>
 			<% end %>
 	 	<% end %>
  	</div>
+
+	<br>
+
+	<% if user_signed_in? %>
+		<div>
+	 		<%= form_tag('/post', method:"post")  do %>
+	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+	 			<input type="hidden" name="volume" value="<%= @volume %>" />
+	 			<input type="hidden" name="page" value="<%= @page %>" />
+	 			<textarea name="content" id="content" placeholder="Comment..." rows="1" cols="15" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
+	 			<div><input type="submit" name="submit" value="Add a new comment"></div>
+	 		<% end %>
+	 	</div>
+	<% end %>
+
 
 
 </div> <!-- col-md-6 -->

@@ -74,4 +74,11 @@
 
 <% content_for :javascript_includes do %>
   <%= javascript_include_tag "documents_browse.js" %>
+  <%= javascript_include_tag "get_selection.js" %>
+  <script>
+    selectedWord = function(){
+      $(".word").val(getSelectionText);
+    };
+  </script>
+
 <% end %>

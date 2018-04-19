@@ -87,6 +87,8 @@ function load_document (p, v){
     });
   $("#doc_view").attr('href', "/doc/show?p="+p+"&v="+v);
   $('#doc_view').css('display', 'inline-block');
+  $("#add_page_semantic").attr('href', "/page_semantic?p="+p+"&v="+v);
+  $('#add_page_semantic').css('display', 'inline-block');
   $('div.active').removeClass("active");
   $('#vol-'+v+'-page-'+p).addClass("active");
 }

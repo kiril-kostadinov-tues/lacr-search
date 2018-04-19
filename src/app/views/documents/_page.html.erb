@@ -33,37 +33,37 @@
 	          </div>
 
 	          	<%= render "home/social_media" %>
-	          	<%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
-	 			
-	 			<a href="#" class="clickme2 btn btn-primary">Add Note</a>
-	 			<div class="box2">
-		 			<%= form_tag('/notes/create', method:"post")  do %>
-		 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
-		 			<input type="hidden" name="volume" value="<%= @volume %>" />
-		 			<input type="hidden" name="page" value="<%= @page %>" />
-		 			<input type="hidden" name="paragraph" value="<%= document.id %>" />
-		 			<textarea name="content" id="content" placeholder="Note..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
-		 			<div><input type="submit" name="submit" value="Add Note"></div>
-		 			<% end %>
-		 		</div>
-
-				<a href="#" class="clickme btn btn-primary">Expand notes</a>
-				<div class="box">
-					<div align="left">
-					 	<% if user_signed_in? %>
-					 		<% @notes.each do |note|%>
-							 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
-							 		<div class="panel panel-primary">
-								 		<%= note.content %>
-								 		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
-								 			<input type="submit" value="Delete" class="btn btn-danger"> 
-								 		<% end %>
-							 		</div>
+	          	<% if user_signed_in? %>
+		          	<%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+		 			
+		 			<a href="#" class="clickme2 btn btn-primary">Add Note</a>
+		 			<div class="box2">
+			 			<%= form_tag('/notes/create', method:"post")  do %>
+			 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+			 			<input type="hidden" name="volume" value="<%= @volume %>" />
+			 			<input type="hidden" name="page" value="<%= @page %>" />
+			 			<input type="hidden" name="paragraph" value="<%= document.id %>" />
+			 			<textarea name="content" id="content" placeholder="Note..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
+			 			<div><input type="submit" name="submit" value="Add Note"></div>
+			 			<% end %>
+			 		</div>
+			 		
+					<a href="#" class="clickme btn btn-primary">Expand notes</a>
+					<div class="box">
+						<div align="left">
+						 		<% @notes.each do |note|%>
+								 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
+								 		<div class="panel panel-primary">
+									 		<%= note.content %>
+									 		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
+									 			<input type="submit" value="Delete" class="btn btn-danger"> 
+									 		<% end %>
+								 		</div>
+								 	<% end %>
 							 	<% end %>
-						 	<% end %>
-						<% end %>
+						</div>
 					</div>
-				</div>
+				<% end %>
 			 	
 
 			</div>
@@ -91,10 +91,12 @@
 		 			</h3>
 		 			<span style='border:1px black solid; font-size:20px;'>"<%= comment.content %>"</span>
 		 		</div>
-		 		<% if comment.user_id == current_user.id%>
-			 		<%= form_tag("/comments/#{comment.id}", method:"delete") do %>
-						<input type="submit" value="Delete your comment" class="btn btn-danger">
-				<% end %>
+		 		<% if user_signed_in? %>
+			 		<% if comment.user_id == current_user.id%>
+				 		<%= form_tag("/comments/#{comment.id}", method:"delete") do %>
+							<input type="submit" value="Delete your comment" class="btn btn-danger">
+						<% end %>
+					<% end %>
 				<% end %>
 		 	<% end %>
 	 	</div>

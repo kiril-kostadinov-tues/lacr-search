@@ -91,6 +91,12 @@ class DocumentsController < ApplicationController
       @volume, @page = params[:v].to_i, params[:p].to_i
       # Select Documents
       @documents = Search.order(:paragraph).where('volume' => @volume).rewhere('page' => @page)
+
+      @xmlcontent = []
+      @documents.each do |document|
+        @xmlcontent << document.content
+      end
+
       if @documents.length > 0
         # Select image
         respond_to do |format|

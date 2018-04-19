@@ -1,2 +1,2 @@
-module TranslationControllerHelper
+module TranslationHelper
 end

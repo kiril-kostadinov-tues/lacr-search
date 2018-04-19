@@ -84,8 +84,13 @@ class SearchController < ApplicationController
     # Parse Spelling variants and Results per page
     get_search_tools_params(permited)
 
+    puts @query
+
+    
+
     # Send the query to Elasticsearch
     if permited[:sm].to_i == 5
+      puts "REGEX"
       @searchMethod = 5  # Regexp
 
         @documents = Search.search '*',
@@ -105,6 +110,7 @@ class SearchController < ApplicationController
         end
 
     else
+      puts "NO REGEX"
       @documents = Search.search @query,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           page: permited[:page], per_page: @results_per_page, # Pagination
@@ -116,6 +122,19 @@ class SearchController < ApplicationController
           suggest: true, # Enable suggestions
           load: false # Do not retrieve data from PostgreSQL
     
+      if @query_lat != ""
+        @documents = Search.search @query_lat,
+          misspellings: {edit_distance: @misspellings,transpositions: false},
+          page: permited[:page], per_page: @results_per_page, # Pagination
+          where: get_adv_search_params(permited), # Parse adv search parameters
+          match: get_serch_method(permited), # Parse search method parameter
+          order: get_order_by(permited), # Parse order_by parameter
+          highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          suggest: true, # Enable suggestions
+          load: false # Do not retrieve data from PostgreSQL
+      end
+
       @images = []
     
       @documents.each do |document|
@@ -243,14 +262,25 @@ class SearchController < ApplicationController
 
  
     @query = permited[:q].present? ? permited[:q].strip : '*'
-    arr_query = @query.split
-    arr_query.each_with_index do |word, index|
-	if en_to_lat.key?(word.downcase)
-		arr_query[index] = en_to_lat[word.downcase]
-	end
-    end
+    
+    @query_lat = ""
+    tr = Translation.find_by language: "latin", translated: @query
 
-    @query = arr_query.join(' ')
+    if tr.nil?
+      if @query.include? " "
+        query_lat = @query
+        parts = @query.split(" ")
+        parts.each do |part|
+          tr = Translation.find_by language: "latin", translated: part
+
+          unless tr.nil?
+            query_lat.gsub!(part, tr.word)
+          end
+        end
+      end
+    else
+      @query_lat = tr.word
+    end
 
     # Get the number of results per page; Default value -> 5
     @results_per_page = 5

@@ -1,4 +1,19 @@
-<div class="container">
-	<p>Search returned <%=@number_of_results %> results</p>
-  	<pre><code><%=@query_result%></code></pre>
-</div>
+<% if @results.length > 0 %>
+  <div id="res" class="list-group">
+    <% @results.each do |result| %>
+
+    <a class="list-group-item" href="<%= doc_show_path%>?p=<%=result.page%>&v=<%=result.volume%>">
+     <h4>
+       Volume: <%= result.volume %>, Page <%= result.page %>
+       <sup>Date: <%= result.date %></sup>
+     </h4>
+      <p><%= result.content %></p>
+      <mdall>ID: <%= result.entry %></mdall>
+    </a>
+    <% end %>
+  </div>
+<% else %>
+    <div class="col-md-8">
+    	<p>Your search did not match any documents.</p>
+	</div>
+<% end %>

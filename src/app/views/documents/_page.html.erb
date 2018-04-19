@@ -33,32 +33,89 @@
           </div>
 
           <%= render "home/social_media" %>
-          <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>  
+          <% if user_signed_in? %>
+		          	<%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+		 			
+		 			<a href="#" class="clickme2 btn btn-primary">Add Note</a>
+		 			<div class="box2">
+			 			<%= form_tag('/notes/create', method:"post")  do %>
+			 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+			 			<input type="hidden" name="volume" value="<%= @volume %>" />
+			 			<input type="hidden" name="page" value="<%= @page %>" />
+			 			<input type="hidden" name="paragraph" value="<%= document.id %>" />
+			 			<textarea name="content" id="content" placeholder="Note..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
+			 			<div><input type="submit" name="submit" value="Add Note"></div>
+			 			<% end %>
+			 		</div>
+			 		
+					<a href="#" class="clickme btn btn-primary">Expand notes</a>
+					<div class="box">
+						<div align="left">
+						 	<% unless @selected_page %>	
+						 		<% @notes.each do |note|%>
+								 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
+								 		<div class="panel panel-primary">
+									 		<%= note.content %>
+									 		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
+									 			<input type="submit" value="Delete" class="btn btn-danger"> 
+									 		<% end %>
+								 		</div>
+								 	<% end %>
+							 	<% end %>
+							<% end %>
+						</div>
+					</div>
+				<% end %> 
 				</div>
 			</div> <!-- panel-body -->
 
 		</div> <!-- panel panel-primary -->
 	<% end %>
-	<% if user_signed_in? %>
-		<% unless @exclude_comments %>
-	 		<%= form_tag('/post', method:"post")  do%>
-	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
-	 			<input type="hidden" name="volume" value="<%= @volume %>" />
-	 			<input type="hidden" name="page" value="<%= @page %>" />
-	 			<textarea name="content" id="content" placeholder="Comment..." cols="40" rows="4"></textarea>
-	 			<input type="submit" name="submit" value="Add Comment">
-	 		<% end %>
- 		<% end %>
- 	<% end %>
-	 <% unless @exclude_comments %>
-	 	<% @comments.each do |comment|%>
-	 		<div>
-	 			<h3><%= comment.user.email %></h3>
-	 			<h5><%= comment.created_at %></h5>
-	 			<p><%= comment.content %></p>
-	 		</div>
-	 	<% end %>
- 	<% end %>
+	<% unless @selected_page %>
+		<a href="#" class="clickme3 btn btn-primary">Show Comments</a>
+		<div class="box3">
+	 		
+		 	<div>
+
+			 	<% @comments.each do |comment|%>
+			 		<style>
+						h3.b {
+		    				white-space: nowrap;
+						}
+					</style>
+
+			 		<div>
+			 			<h3 class="b">
+				 			User: <%= comment.user.email %>
+				 			Posted at: <%= comment.created_at %>	
+			 			</h3>
+			 			<span style='border:1px black solid; font-size:20px;'>"<%= comment.content %>"</span>
+			 		</div>
+			 		<% if user_signed_in? %>
+				 		<% if comment.user_id == current_user.id%>
+					 		<%= form_tag("/comments/#{comment.id}", method:"delete") do %>
+								<input type="submit" value="Delete your comment" class="btn btn-danger">
+							<% end %>
+						<% end %>
+					<% end %>
+			 	<% end %>
+		 	</div>
+
+			<br>
+
+			<% if user_signed_in? %>
+				<div>
+			 		<%= form_tag('/post', method:"post")  do %>
+			 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+			 			<input type="hidden" name="volume" value="<%= @volume %>" />
+			 			<input type="hidden" name="page" value="<%= @page %>" />
+			 			<textarea name="content" id="content" placeholder="Comment..." rows="1" cols="15" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
+			 			<div><input type="submit" name="submit" value="Add a new comment"></div>
+			 		<% end %>
+			 	</div>
+			<% end %>
+		</div>
+	<% end %>
 </div> <!-- col-md-6 -->
 <!-- End of the left side -->
 
@@ -71,3 +128,45 @@
 	</div> <!-- col-md-6 -->
 <% end %>
 <!-- End of the right side -->
+
+<script>
+  $(document).ready(function() {
+    $('.box').hide();
+    $('.clickme').each(function() {
+      $(this).show(0).on('click', function(e) {
+        e.preventDefault();
+        $(this).next('.box').slideToggle('fast', function() {
+          $(this).prev().html($(this).is(':visible') ? 'Hide notes' : 'Expand notes');
+        });
+      });
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('.box2').hide();
+    $('.clickme2').each(function() {
+      $(this).show(0).on('click', function(e) {
+        e.preventDefault();
+        $(this).next('.box2').slideToggle('fast', function() {
+          $(this).prev().html($(this).is(':visible') ? 'Add Notes' : 'Add Notes');
+        });
+      });
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('.box3').hide();
+    $('.clickme3').each(function() {
+      $(this).show(0).on('click', function(e) {
+        e.preventDefault();
+        $(this).next('.box3').slideToggle('fast', function() {
+          $(this).prev().html($(this).is(':visible') ? 'Hide Comments' : 'Expand Comments');
+        });
+      });
+    });
+  });
+</script>

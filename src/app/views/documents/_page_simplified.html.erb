@@ -1,6 +1,9 @@
-<div class="col-md-12">
 
+
+<div class="col-md-12">
+<% i = 0 %>
   <% @documents.each do |document| %>
+  
 		<div class="panel panel-primary">
 			<div class="panel-heading">
         <div class="row">
@@ -30,10 +33,52 @@
         <div class="checkbox">
           <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
         </div>
+        <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+        <%= link_to "Add Paragraph Semantics", page_semantic_path(:id => document.id, :p => @page, :v => @volume), class: "btn btn-primary", :method => :get %>
+        <a href="#" class="openanno btn btn-primary">Show Annotations</a>
+			<div class="box4">
+				<% document.content.scan(/<(.*?)>(.*?)<\/(.*?)>/).each do |annotation| %>
+					<% if annotation[0].eql?(annotation[2]) %>
+						<%= "#{annotation[0]}: #{annotation[1]}" %>
+						<%= form_tag("/annotation_delete", method:"delete") do %>
+							<%= hidden_field_tag "id", document.id %>
+							<%= hidden_field_tag "p", @page %>
+							<%= hidden_field_tag "v", @volume %>
+							<%= hidden_field_tag "annotation", annotation[1] %>
+							<%= hidden_field_tag "tag", annotation[0] %>
+							<input type="submit" value="Delete" class="btn btn-danger">					
+							<br>
+						<% end %>
+					<% end %>
+				<% end %>
+				
+			</div>
+			<% i += 1 %>
+        
+        <form action="word_semantic" method = "get" onsubmit="selectedWord()">
+		  <input type ="hidden" name = "word" class= "word" >
+		  <input type ="hidden" name = "v" value = "<%=document.volume %>" >
+		  <input type ="hidden" name = "p" value = "<%=document.page%>" >
+		  <input type="hidden" name="id" value = "<%=document.id%>" >
+		  <input type = "submit" value="Add Word Annotation", class = "btn btn-primary">
+		</form>
+		<br>
         <%= render "home/social_media" %>
-        <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>     	
-                 
       </div>
 		</div> <!-- panel panel-primary -->
   <% end %>
 </div> <!-- col-md-6 -->
+
+<script>
+  $(document).ready(function() {
+    $('.box4').hide();
+    $('.openanno').each(function() {
+      $(this).show(0).on('click', function(e) {
+        e.preventDefault();
+        $(this).next('.box4').slideToggle('fast', function() {
+          $(this).prev().html($(this).is(':visible') ? 'Hide Annotations' : 'Show Annotations');
+        });
+      });
+    });
+  });
+</script>

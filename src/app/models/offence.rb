@@ -1,0 +1,2 @@
+class Offence < ApplicationRecord
+end

@@ -21,10 +21,37 @@
 </div>
 <% end %>
 
+<%= form_for @documents, url: {action: "page_semantic_patched"} do |f| %>
+	Offence <%= f.select_tag(:offence, options_for_select(@offences, @documents.offence), {include_blank: true, multiple: true}) %>
+	Verdict <%= f.select_tag(:verdict, options_for_select(@verdicts, @documents.verdict), {include_blank: true, multiple: true}) %>
+	Sentence <%= f.select_tag(:sentence, options_for_select(@sentences, @documents.sentence), {include_blank: true, multiple: true}) %>
+	<%= f.hidden_field_tag :page, @page%>
+	<%= f.hidden_field_tag :volume, @volume %>
+	<%= f.hidden_field_tag :id, @id %>
+	<%= f.submit "Submit" %>
+<% end %>
+
+<%= form_tag("/create_offence", method: "post") do %>
+	New Offence <%= text_field_tag :name, nil, :required => true %>
+	<%= submit_tag("Create Offence") %>
+<% end %>
+
+<%= form_tag("/create_verdict", method: "post") do %>
+	New Verdict <%= text_field_tag :name, nil, :required => true %>
+	<%= submit_tag("Create Verdict") %>
+<% end %>
+
+<%= form_tag("/create_sentence", method: "post") do %>
+	New Sentence <%= text_field_tag :name, nil, :required => true %>
+	<%= submit_tag("Create Sentence") %>
+<% end %>
+
+
 
 <div class="col-md-10">
 	<div id="transcription-image"></div>
 </div> <!-- <div class="col-md-10" id="transcription-image"> -->
+
 
 
 <% content_for :javascript_includes do %>
@@ -57,13 +84,4 @@
 		});
 	});
 	</script>
-<% end %>
-<%= form_for @documents, url: {action: "page_semantic_patched"} do |f| %>
-	Offence <%= f.select_tag(:offence, options_for_select([['Arsony', 'Arsony'],['Murder', 'Murder']]), {include_blank: true}) %> <br>
-	Verdict <%= f.select_tag(:verdict, options_for_select([['Sentenced', 'Sentenced'],['Pardoned', 'Pardoned']]), {include_blank: true}) %> <br>
-	Sentence <%= f.select_tag(:sentence, options_for_select([['Death', 'Death'],['Fine', 'Fine']]), {include_blank: true}) %> <br>
-	<%= f.hidden_field_tag :page, @page%>
-	<%= f.hidden_field_tag :volume, @volume %>
-	<%= f.hidden_field_tag :id, @id %>
-	<%= f.submit "Submit" %>
 <% end %>

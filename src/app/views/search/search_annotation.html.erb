@@ -1,0 +1,34 @@
+<div class="container" >
+<%= render '/search/search_tools' %>
+
+
+<% if @documents.length > 0 %>
+  <div id="res" class="list-group">
+    <% @documents.each do |document| %>
+
+    <a class="list-group-item" href="<%= doc_show_path%>?p=<%=document.page%>&v=<%=document.volume%>">
+     <h4>
+       Volume: <%= document.volume %>, Page <%= document.page %>
+       <sup>Date: <%= document.date %></sup>
+     </h4>
+      <% if defined? document.highlighted_content %>
+      <p class="highlighted_content"><%= document.highlighted_content.html_safe %></p>
+      <%else%>
+      <p><%= document.content.gsub(/<[^>]*>/, "") %></p>
+      <%end%>
+      <mdall>ID: <%= document.entry %></mdall>
+    </a>
+    <% end %>
+  </div>
+
+  <% else %>
+    <div class="col-md-8">
+      <p>Your search - <%= raw truncate(@query, :length => 30) %> - did not match any documents.</p>
+      <p>Suggestions:</p>
+      <ul>
+        <li>Try different keywords.</li>
+      </ul>
+    </div>
+  <% end %>
+</div>
+</div> <!-- slide -->

@@ -1,13 +1,28 @@
 <div class="container">
 	<h1>Choose an entity to search for</h1>
 
-	<%= form_tag(semantic_search_page_path, :method => "post") do %>
-	<%= select_tag("term", options_for_select(["Arsony","Murder"]), class:"form-control")%>
-	<%= submit_tag "Search for Sentence", class: "btn btn-primary" %>
-	<% end %>
+	<%= form_tag(semantic_search_word_path, :method => "post") do %>	
+	<%= select_tag("offence", options_for_select(@offences), class:"form-control")%>	
+	<%= select_tag("verdict", options_for_select(@verdicts), class:"form-control")%>
+	<%= select_tag("sentence", options_for_select(@sentences), class:"form-control")%>
+	
+	<br><br><br><br>
 
-	<%= form_tag(semantic_search_word_path, :method => "post") do %>
-	<%= select_tag("term", options_for_select(["John Dough"]), class:"form-control") %>
+	<div id = "searchSet">
+		<%= render partial: "word_semantics" %>
+	</div>
+	<a href="javascript:;" id="addNewSearch", class = "btn btn-primary">Add Search Field</a>
 	<%= submit_tag "Search for Annotation", class: "btn btn-primary" %>
 	<% end %>
 </div>
+
+<% content_for :javascript_includes do %>
+	<script type="text/javascript">
+		$(document).ready(function(){
+		  $("#addNewSearch").click(function(){
+		  	$($(".select_tag")[0]).clone().appendTo($('div#searchSet'));
+		  	$($(".text_field")[0]).clone().val(null).appendTo($('div#searchSet'))
+		  });
+		});
+	</script>
+<% end %>

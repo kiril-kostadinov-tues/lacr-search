@@ -79,8 +79,8 @@
   <%= javascript_include_tag "documents_browse.js" %>
   <%= javascript_include_tag "get_selection.js" %>
   <script>
-    gosho = function(){
-      $(".ne").val(getSelectionText);
+    selectedWord = function(){
+      $(".word").val(getSelectionText);
     };
   </script>
 <% end %>

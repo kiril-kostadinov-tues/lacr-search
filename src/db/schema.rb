@@ -10,10 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180410004222) do
+ActiveRecord::Schema.define(version: 20180419012250) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "annotations", force: :cascade do |t|
+    t.string "name"
+  end
 
   create_table "comments", force: :cascade do |t|
     t.text     "content"
@@ -22,6 +26,10 @@ ActiveRecord::Schema.define(version: 20180410004222) do
     t.integer  "search_page"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+  end
+
+  create_table "offences", force: :cascade do |t|
+    t.string "name"
   end
 
   create_table "page_images", force: :cascade do |t|
@@ -43,14 +51,18 @@ ActiveRecord::Schema.define(version: 20180410004222) do
     t.text     "content"
     t.date     "date"
     t.string   "date_incorrect"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-    t.string   "offence"
-    t.string   "verdict"
-    t.string   "sentence"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "offence",              default: [],              array: true
+    t.integer  "verdict",              default: [],              array: true
+    t.integer  "sentence",             default: [],              array: true
     t.index ["page"], name: "index_searches_on_page", using: :btree
     t.index ["paragraph"], name: "index_searches_on_paragraph", using: :btree
     t.index ["volume"], name: "index_searches_on_volume", using: :btree
+  end
+
+  create_table "sentences", force: :cascade do |t|
+    t.string "name"
   end
 
   create_table "tr_paragraphs", force: :cascade do |t|
@@ -85,6 +97,10 @@ ActiveRecord::Schema.define(version: 20180410004222) do
     t.boolean  "admin",                  default: false
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  end
+
+  create_table "verdicts", force: :cascade do |t|
+    t.string "name"
   end
 
   add_foreign_key "searches", "tr_paragraphs", on_delete: :cascade

@@ -1,10 +1,15 @@
 <h1 align="center">Add word semantic</h1>
-<%= @da %>
 <%= form_tag 'word_semantic' do %>
-	Person <%= select_tag(:person, options_for_select([['John Dough', 'John Dough'],['Peter Rabbit', 'Petter Rabbit']]), {include_blank: true}) %> <br>
+	Category <%= select_tag :tag, options_for_select(@annotations), class:"btn btn-primary" %>
+	Annotating "<%= @word %>"
 	<%= hidden_field_tag :p, @page%>
 	<%= hidden_field_tag :v, @volume %>
 	<%= hidden_field_tag :id, @id %>
-	<%= hidden_field_tag :word, @da %>
-	<%= submit_tag "Submit" %>
+	<%= hidden_field_tag :word, @word %>
+	<%= submit_tag "Create Annotation", class:"btn btn-primary" %>
+<% end %>
+<br>
+<%= form_tag 'create_category' do %>
+	<%= text_field_tag :annotation, nil,  :required => true %>
+	<%= submit_tag "Create a new category", class:"btn btn-primary" %>
 <% end %>

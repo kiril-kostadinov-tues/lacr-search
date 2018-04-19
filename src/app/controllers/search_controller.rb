@@ -127,6 +127,63 @@ class SearchController < ApplicationController
     end
   end
 
+  def search_annotation
+
+    # Use strong params
+    permited = simple_search_params
+
+    # Parse Spelling variants and Results per page
+    get_search_tools_params(permited)
+    search_query = ""
+    terms = params[:term]
+    term_values = params[:term_value]
+    search_array = []
+    if terms.eql?([""])
+      search_query = '*'
+    else
+      terms.each_with_index do |term, i|
+        unless term.empty? or term_values[i].empty?
+          search_array << "<#{term}>#{term_values[i]}</#{term}>"
+        end
+      end
+      search_query = search_array.join(" ")
+    end
+   
+
+
+    @documents = Search.search search_query,
+          order: get_order_by(permited), # Parse order_by parameter
+          #highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          load: false # Do not retrieve data from PostgreSQL
+    @documents = @documents.results
+
+    unless params[:verdict].empty?
+      @documents = @documents.select do |document|
+        unless document.verdict.nil?
+          document.verdict.include?(params[:verdict].to_i)
+        end
+      end
+    end
+
+    unless params[:offence].empty?
+      @documents = @documents.select do |document|
+        unless document.offence.nil?
+          document.offence.include?(params[:offence].to_i)
+        end
+      end
+    end
+
+    unless params[:sentence].empty?
+      @documents = @documents.select do |document|
+        unless document.sentence.nil?
+          document.sentence.include?(params[:sentence].to_i)
+        end
+      end
+    end
+
+  end
+
   def autocomplete
     # Strip white-space at the beginning and the end.
     query = params[:term].strip.gsub(/[^0-9a-z]/i, '')

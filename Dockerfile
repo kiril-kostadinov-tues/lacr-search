@@ -44,6 +44,7 @@ ADD src/Gemfile.lock /lacr-search/Gemfile.lock
 
 # Install requered gems
 RUN bundle install
+RUN bundle check
 
 
 # Disable the proxy settings.

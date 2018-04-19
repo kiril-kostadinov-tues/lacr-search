@@ -12,6 +12,8 @@ class DocumentsController < ApplicationController
         @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
       end
     end
+    
+
   end
 
   def selected
@@ -91,11 +93,16 @@ class DocumentsController < ApplicationController
       @volume, @page = params[:v].to_i, params[:p].to_i
       # Select Documents
       @documents = Search.order(:paragraph).where('volume' => @volume).rewhere('page' => @page)
+      @xmlcontent = []
+      @documents.each do |document|
+        @xmlcontent << document.content
+      end
+
       if @documents.length > 0
         # Select image
         respond_to do |format|
-         format.html { render :partial => "documents/page_simplified" }
-       end
+        format.html { render :partial => "documents/page_simplified" }
+      end
       else
         render status: 500
       end
@@ -276,6 +283,18 @@ class DocumentsController < ApplicationController
       # Use recursion
       xml_to_html(c)
     end
+  end
+
+  def get_string_between(my_string, start_at, end_at)
+      my_string = " #{my_string}"
+      ini = my_string.index(start_at)
+      if ini.nil?
+        return nil
+      end
+      return my_string if ini == 0
+      ini += start_at.length
+      length = my_string.index(end_at, ini).to_i - ini
+      my_string[ini,length]
   end
 
 

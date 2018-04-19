@@ -1,0 +1,225 @@
+<!-- Left Side: Text contet -->
+<div class="<% if @document_image_normal %>col-md-6<%else%>col-md-10<%end%>" id="doc-transcriptions">
+<% count = 0 %>
+  <% @documents.each do |document| %>
+		<div class="panel panel-primary" id="<%= document.entry %>">
+			<div class="panel-heading">
+				<div class="row">
+					<% if document.entry %><div class="col-sm-4">
+						<strong>ID: </strong><span><%= document.entry %></span>
+					</div>
+          <%end%>
+
+          <%if document.date or document.date_incorrect %>
+					<div class="col-sm-4">
+						<strong>Date: </strong><span><% if document.date_incorrect %><%= document.date_incorrect %><% else %><%= document.date %><% end %></span>
+					</div>
+          <%end%>
+
+          <%if document.lang %>
+					<div class="col-sm-4">
+						<strong>Language: </strong><span class="pr-language"><%= document.lang %></span>
+					</div> <!-- col-md-4 -->
+          <%end%>
+				</div> <!-- row -->
+			</div>  <!-- panel-heading -->
+			<div class="panel-body">
+				<pre class="prettyprint transcription" style="display: none;"><code class="language-xml"><%= document.tr_paragraph.content_xml.gsub(/^\s+/, ' ')%></code></pre>
+				<div class="transcription tr-text" id="content"><% temp = document.tr_paragraph.content_html.html_safe.split("<br").each_with_index.map{|s,i| i == 0 ? s :  '<span id="line'+(count+i).to_s+'"><br '+s+'</span>'}%><% count = count + temp.length - 1%> <%=temp.join('').html_safe%></div>
+				<div class="panel-footer">
+          <button class="btn btn-default btn-sm" onclick="toggle_xml(this);">XML</button>
+          <div class="checkbox" style="display: inline-block; float: inline-end;">
+            <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
+          </div>
+
+          <%= render "home/social_media" %>
+          <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %>  
+				</div>
+			</div> <!-- panel-body -->
+
+		</div> <!-- panel panel-primary -->
+	<% end %>
+	<% if user_signed_in? %>
+	 		<%= form_tag('/post', method:"post")  do%>
+	 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
+	 			<input type="hidden" name="volume" value="<%= @volume %>" />
+	 			<input type="hidden" name="page" value="<%= @page %>" />
+	 			<textarea name="content" id="content" placeholder="Comment..." cols="40" rows="4"></textarea>
+	 			<input type="submit" name="submit" value="Add Comment">
+	 		<% end %>
+	 	<% end %>
+	 	<% @comments.each do |comment|%>
+	 		<div>
+	 			<h3><%= comment.user.email %></h3>
+	 			<h5><%= comment.created_at %></h5>
+	 			<p><%= comment.content %></p>
+	 		</div>
+ 	<% end %>
+</div> <!-- col-md-6 -->
+<!-- End of the left side -->
+
+<!-- Right Side: Image -->
+<% if @document_image_normal %>
+	<div class="col-md-6">
+
+		<span class='zoom' id="doc-image" data-spy="affix" data-offset-top="205">
+			<%= image_tag(@document_image_normal, id:"page-img", onload:"fuck()", class:"img-rounded img-responsive", data:	{large_image: @document_image_large}) %>
+		</span>
+
+		<canvas  id="page-canvas""></canvas>
+	</div> <!-- col-md-6 -->
+<% end %>
+<!-- End of the right side -->
+
+<script type="text/javascript">
+function fuck(){
+		var ctx;
+		var img;
+		var canvas;
+		var zoom;
+
+		var w = window.innerWidth;
+		var h = window.innerHeight;
+
+		//large img size
+		orig_width = 1563
+		orig_height = 2048
+
+		img = new Image();
+		img.src = "<%= @document_image_normal%>";
+		magnify_icon = new Image();		
+		magnify_icon.src = "<%= asset_path("magnifying_glass_icon.png")%>";
+
+		canvas = document.getElementById("page-canvas");
+		zoom = document.getElementById("doc-image");
+
+		canvas.addEventListener("mouseover", hideCanvas);
+		zoom.addEventListener("mouseout", showCanvas);
+		$("[id^='line']").mouseup(compareLines);
+		//window.addEventListener("resize",resizeCanvas);
+		console.log(window.innerWidth);
+
+		setTimeout(function(){},3000);
+		canvas.style.width = zoom.clientWidth;
+		canvas.style.height = zoom.clientHeight;
+		canvas.width = zoom.offsetWidth;
+		canvas.height = zoom.offsetHeight;
+		wScale = orig_width / canvas.width;
+		hScale = orig_height / canvas.height;
+		ctx = canvas.getContext("2d");
+
+		ctx.drawImage(img,0,0,canvas.width,canvas.height);
+		ctx.drawImage(magnify_icon,canvas.width-33,0,33,33);
+		showCanvas();
+		
+		function resizeCanvas(){
+			currw = window.innerWidth;
+			currh = window.innerHeight;
+			canvas.style.width = canvas.style.width / w / currw;
+			canvas.style.height = canvas.style.height / h / currh;
+			canvas.width = canvas.width / w / currw;
+			canvas.height = canvas.height / h / currh;
+			//orig image size
+			wScale = orig_width / canvas.width;
+			hScale = orig_height / canvas.height;
+
+			w = currw;
+			h = currh;
+			ctx = canvas.getContext("2d");
+				
+			ctx.drawImage(img,0,0,canvas.width,canvas.height);
+			ctx.drawImage(magnify_icon,canvas.width-33,0,33,33);
+		}
+		
+		function hideCanvas(){
+			$("#page-canvas").hide();
+			$("#doc-image").show();
+		}
+		function showCanvas(){
+			$("#doc-image").hide();
+			$("#page-canvas").show();
+		}
+
+		function compareLines() {				
+			tr2 = $("#"+this.id).text().replace(/\s\s+/g, ' ').toString();
+			<% @lines.each do |line| %>
+				tr = "<%= line.transcript %>";
+				//console.log("Comparing strings\n");
+				console.log(tr);
+				console.log(tr2+'\n');
+				console.log(calculateLinesSimilarity(tr2,tr));
+				if(calculateLinesSimilarity(tr2,tr) > 0.75){ 
+					draw(<%=line.x1%>,<%=line.y1%>,<%=line.x2%>,<%=line.y2%>,<%=line.x3%>,<%=line.y3%>,<%=line.x4%>,<%=line.y4%>); 
+					return;
+				}
+				else clearLines();
+			<% end %>
+			//$("#"+this.id).text(res);
+		}
+
+		function calculateLinesSimilarity(s1,s2) {
+			var longer = s1;
+			var shorter = s2;
+			if (s1.length < s2.length) {
+				longer = s2;
+			    shorter = s1;
+			}
+			var longerLength = longer.length;
+			if (longerLength == 0) {
+				return 1.0;
+			}
+			return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+		}
+
+		function editDistance(s1,s2){
+			s1 = s1.toLowerCase();
+  			s2 = s2.toLowerCase();
+
+			var costs = new Array();
+			for (var i = 0; i <= s1.length; i++) {
+			    var lastValue = i;
+			    for (var j = 0; j <= s2.length; j++) {
+			    	if (i == 0)
+			        	costs[j] = j;
+			      	else {
+			        	if (j > 0) {
+			          		var newValue = costs[j - 1];
+			          	if (s1.charAt(i - 1) != s2.charAt(j - 1))
+			            	newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+			          	costs[j - 1] = lastValue;
+			          	lastValue = newValue;
+			        }
+			      }
+			    }
+			    if (i > 0)
+			    	costs[s2.length] = lastValue;
+			  }
+			  return costs[s2.length];
+		}
+
+		function clearLines(){
+			console.log("clearing lines");
+			ctx.globalAlpha = 1;
+			ctx.fillStyle = "#000000";
+			ctx.clearRect(0, 0, canvas.width, canvas.height);			
+			ctx.drawImage(img,0,0,canvas.width, canvas.height);		
+			ctx.drawImage(magnify_icon,canvas.width-33,0,33,33);
+		}
+
+		function draw(){
+			clearLines();
+			console.log("drawing line");
+			ctx.globalAlpha = 0.25;
+			ctx.fillStyle = "#438ACA";
+			ctx.beginPath();
+			ctx.moveTo(arguments[0]/wScale,arguments[1]/hScale);
+			ctx.lineTo(arguments[2]/wScale,arguments[3]/hScale);
+			ctx.lineTo(arguments[4]/wScale,arguments[5]/hScale);
+			ctx.lineTo(arguments[6]/wScale,arguments[7]/hScale);
+			ctx.closePath();
+			ctx.fill();
+		}
+		
+	}
+	</script>
+

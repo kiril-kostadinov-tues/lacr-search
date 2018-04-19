@@ -1,0 +1,10 @@
+<div class="container">
+	<%PageImage.all.each do |img| %>
+		<%= form_tag "update_lines" do %>			
+			Volume <%=img.volume%>, Page <%=img.page%>
+			<%= hidden_field_tag :vol, img.volume %>
+			<%= hidden_field_tag :page, img.page %>
+			<%= submit_tag "Update", class: "btn btn-success" %>
+		<% end %>
+	<% end %>
+</div>

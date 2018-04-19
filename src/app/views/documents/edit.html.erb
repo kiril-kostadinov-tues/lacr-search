@@ -1,0 +1,28 @@
+<div class="text-center">
+  <h1>Edit a document</h1>
+
+  <% if !flash[:notice].blank? %>
+     <div class = "alert alert-info">
+        <%= flash[:notice] %>
+     </div>
+  <% end %>
+
+
+  <div class="well document-edit">
+     <%= form_tag({action: :edit_finished}) do %>
+
+        <%= fields_for :transcription_xml do |t| %>
+          <%= t.label :new_xml, 'Edit XML' %>
+          <%= t.text_area :new_xml, :value => @content, size: "92x15" %> <br />
+          <input type = "hidden" name = "edited_document_id" value = "<%= params[:id] %>" />
+        <% end %>
+
+        <%= fields_for :page_image do |t| %>
+          <%= t.label :image, 'Upload a new image' %>
+          <%= t.file_field :image, accept: '.tiff, .tif' %> <br />
+          <% end %>
+
+        <%= submit_tag "Edit", class: "btn btn-primary btn-block" %>
+     <% end %>
+  </div>
+</div>

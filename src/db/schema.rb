@@ -40,7 +40,6 @@ ActiveRecord::Schema.define(version: 20180419055857) do
     t.datetime "updated_at", null: false
   end
 
-
   create_table "page_images", force: :cascade do |t|
     t.jsonb    "image"
     t.integer  "volume"

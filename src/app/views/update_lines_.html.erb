@@ -1,9 +1,0 @@
-<div class="container">
-	<%PageImage.find_each do |img| %>
-		<form>			
-			Volume <%=img.volume%>, Page <%=img.page%> <input type="hidden" name="vol" value = "<%=img.volume%>">
-			<input type="hidden" name="page" value = "<%=img.page%>">			
-			<input type="submit" value="Update">
-		</form>
-	<% end %>
-</div>

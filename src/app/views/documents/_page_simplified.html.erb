@@ -32,8 +32,7 @@
       <div class="panel-footer">
         <div class="checkbox">
           <label><input class="add-to-list" data-entry="<%= document.entry %>" type="checkbox"> Add to selected</label>
-        </div>
-        <%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
+        </div> 
         <%= link_to "Add Paragraph Semantics", page_semantic_path(:id => document.id, :p => @page, :v => @volume), class: "btn btn-primary", :method => :get %>
         <a href="#" class="openanno btn btn-primary">Show Annotations</a>
 			<div class="box4">
@@ -60,6 +59,7 @@
 		  <input type ="hidden" name = "v" value = "<%=document.volume %>" >
 		  <input type ="hidden" name = "p" value = "<%=document.page%>" >
 		  <input type="hidden" name="id" value = "<%=document.id%>" >
+		  <br>
 		  <input type = "submit" value="Add Word Annotation", class = "btn btn-primary">
 		</form>
 		<br>

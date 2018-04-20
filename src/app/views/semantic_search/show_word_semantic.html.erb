@@ -1,15 +1,25 @@
 <h1 align="center">Add word semantic</h1>
-<%= form_tag 'word_semantic' do %>
-	Category <%= select_tag :tag, options_for_select(@annotations), class:"btn btn-primary" %>
-	Annotating "<%= @word %>"
-	<%= hidden_field_tag :p, @page%>
-	<%= hidden_field_tag :v, @volume %>
-	<%= hidden_field_tag :id, @id %>
-	<%= hidden_field_tag :word, @word %>
-	<%= submit_tag "Create Annotation", class:"btn btn-primary" %>
-<% end %>
+<h3 align="center">Annotating "<%= @word %>"</h3>
+<div class = "container">
+	<%= form_tag 'word_semantic' do %>
+	<div class = "col-sm-12"><p>Category</p></div>
+		<div class = "col-sm-9">
+			 <%= select_tag :tag, options_for_select(@annotations), class: "form-control" %>
+		</div>
+		<%= hidden_field_tag :p, @page%>
+		<%= hidden_field_tag :v, @volume %>
+		<%= hidden_field_tag :id, @id %>
+		<%= hidden_field_tag :word, @word %>
+		<%= submit_tag "Create Annotation", class:"btn btn-primary col-sm-3" %>
+		
+	<% end %>
+</div>
 <br>
-<%= form_tag 'create_category' do %>
-	<%= text_field_tag :annotation, nil,  :required => true %>
-	<%= submit_tag "Create a new category", class:"btn btn-primary" %>
-<% end %>
+<div class = "container">
+	<%= form_tag 'create_category' do %>
+		<div class = "col-sm-9">
+			<%= text_field_tag :annotation, nil,  :required => true, class: "form-control" %>
+		</div>
+		<%= submit_tag "Create a new category", class:"btn btn-primary col-sm-3" %>
+	<% end %>
+</div>

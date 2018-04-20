@@ -37,27 +37,30 @@
 		          	<%= link_to "Edit Document", doc_edit_path(:id => document.id), class: "btn btn-primary", :method => :post %> 
 		 			
 		 			<a href="#" class="clickme2 btn btn-primary">Add Note</a>
-		 			<div class="box2">
+		 			<div class="box2 container-fluid">
+
 			 			<%= form_tag('/notes/create', method:"post")  do %>
 			 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
 			 			<input type="hidden" name="volume" value="<%= @volume %>" />
 			 			<input type="hidden" name="page" value="<%= @page %>" />
 			 			<input type="hidden" name="paragraph" value="<%= document.id %>" />
-			 			<textarea name="content" id="content" placeholder="Note..." rows="1" cols="10" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
-			 			<div><input type="submit" name="submit" value="Add Note"></div>
+			 			<input type="text" name="content" id="content" placeholder="Note..." required class = "form-control">
+			 			<div><input type="submit" name="submit" value="Add Note" class="btn btn-success"></div>
+			 			<br>	
 			 			<% end %>
 			 		</div>
 			 		
 					<a href="#" class="clickme btn btn-primary">Expand notes</a>
 					<div class="box">
 						<div align="left">
-						 	<% unless @selected_page %>	
+						 	<% unless @selected_page %>
+						 	<br>
 						 		<% @notes.each do |note|%>
 								 	<% if note.user_id == current_user.id && note.search_paragraph == document.id %>
-								 		<div class="panel panel-primary">
-									 		<%= note.content %>
+								 		<div class="panel panel-primary container-fluid">
+									 		<div class="container col-sm-9"><%= note.content %></div>
 									 		<%= form_tag("/notes/#{note.id}", method:"delete") do %>
-									 			<input type="submit" value="Delete" class="btn btn-danger"> 
+									 			<input type="submit" value="Delete" class="btn btn-danger col-sm-3"> 
 									 		<% end %>
 								 		</div>
 								 	<% end %>
@@ -72,29 +75,28 @@
 		</div> <!-- panel panel-primary -->
 	<% end %>
 	<% unless @selected_page %>
-		<a href="#" class="clickme3 btn btn-primary">Show Comments</a>
 		<div class="box3">
 	 		
 		 	<div>
 
 			 	<% @comments.each do |comment|%>
 			 		<style>
-						h3.b {
+						h5.b {
 		    				white-space: nowrap;
 						}
 					</style>
 
 			 		<div>
-			 			<h3 class="b">
+			 			<h5 class="b">
 				 			User: <%= comment.user.email %>
 				 			Posted at: <%= comment.created_at %>	
-			 			</h3>
-			 			<span style='border:1px black solid; font-size:20px;'>"<%= comment.content %>"</span>
+			 			</h5>
+			 			<span>"<%= comment.content %>"</span>
 			 		</div>
 			 		<% if user_signed_in? %>
 				 		<% if comment.user_id == current_user.id%>
 					 		<%= form_tag("/comments/#{comment.id}", method:"delete") do %>
-								<input type="submit" value="Delete your comment" class="btn btn-danger">
+								<input type="submit" value="Delete comment" class="btn btn-danger">
 							<% end %>
 						<% end %>
 					<% end %>
@@ -109,12 +111,15 @@
 			 			<input type="hidden" name="user_id" value="<%= current_user.id %>" />
 			 			<input type="hidden" name="volume" value="<%= @volume %>" />
 			 			<input type="hidden" name="page" value="<%= @page %>" />
-			 			<textarea name="content" id="content" placeholder="Comment..." rows="1" cols="15" onfocus="this.rows=5; this.cols=40" style="resize: none;" required></textarea>
-			 			<div><input type="submit" name="submit" value="Add a new comment"></div>
+			 			<textarea name="content" id="content" placeholder="Comment..." required class="form-control"></textarea>
+			 			<div><input type="submit" name="submit" value="Add a new comment" class="btn btn-success"></div>
 			 		<% end %>
 			 	</div>
+			 	<br>
 			<% end %>
 		</div>
+
+		<a href="#" class="clickme3 btn btn-primary">Show Comments</a>
 	<% end %>
 </div> <!-- col-md-6 -->
 <!-- End of the left side -->
@@ -319,8 +324,8 @@ function loadScript(){
     $('.clickme3').each(function() {
       $(this).show(0).on('click', function(e) {
         e.preventDefault();
-        $(this).next('.box3').slideToggle('fast', function() {
-          $(this).prev().html($(this).is(':visible') ? 'Hide Comments' : 'Expand Comments');
+        $(this).prev('.box3').slideToggle('fast', function() {
+          $(this).next().html($(this).is(':visible') ? 'Hide Comments' : 'Expand Comments');
         });
       });
     });

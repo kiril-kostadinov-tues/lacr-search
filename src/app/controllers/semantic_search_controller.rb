@@ -5,9 +5,9 @@ class SemanticSearchController < ApplicationController
 	    sentences = Sentence.all
 	    annotations = Annotation.all
 
-	    @offences = [["Any",""]]
-	    @verdicts = [["Any",""]]
-	    @sentences = [["Any",""]]
+	    @offences = [["Any Offence",""]]
+	    @verdicts = [["Any Verdict",""]]
+	    @sentences = [["Any Sentence",""]]
 	    @annotations = [[""]]
 
 

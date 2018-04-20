@@ -1,4 +1,8 @@
 <div class = "wordSemantics">
-	<%= select_tag("term[]", options_for_select(@annotations), class:"form-control select_tag") %>
-	<%= text_field_tag("term_value[]", nil, :placeholder => "Annotation here", class: "form-control text_field") %>
+	<div class = "col-sm-6">
+		<%= select_tag("term[]", options_for_select(@annotations), class: "form-control select_tag") %>
+	</div>
+	<div class = "col-sm-6">
+		<%= text_field_tag("term_value[]", nil, :placeholder => "Annotation here", class: "form-control text_field") %>
+	</div>
 </div>

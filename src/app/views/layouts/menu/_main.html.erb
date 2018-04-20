@@ -40,6 +40,9 @@
       <li><%= link_to "Advanced Search", root_path+"#advsearch" %> </li>
       <li><%= link_to "Semantic Search", semantic_search_path %></li>
       <li> <%= link_to "About", root_path+"#about" %> </li>
+      <% if user_signed_in? %>
+        <li> <%= link_to "Notes", notes_path %> </li>
+      <% end %>
       <!-- menu for user authenticacion -->
       <li>
         <div class = "btn-group">

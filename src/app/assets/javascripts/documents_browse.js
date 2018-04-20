@@ -4,11 +4,13 @@ var $selected = {};
 function toggle_gallery () {
   if ($('#gallery').css('visibility') === 'hidden') {
     $('#doc-browse').fadeToggle();
+    $('#doc-title').hide();
     $('#gallery').css('visibility', 'visible');
     $('#gallery').css('height', 'auto');
     $(window).trigger('resize');
   } else {
     $('#gallery').fadeToggle();
+    $('#doc-title').show();
     $('#doc-browse').fadeToggle();
     $(window).trigger('resize');
   }
@@ -74,6 +76,7 @@ function show_browser(){
 
 function load_document (p, v){
   $('#doc-title').html("Volume: "+v+" Page: "+p);
+  $('.word').popover('hide');
   $("#transcriptions").load("/doc/page-s?p="+p+"&v="+v, function(responseTxt, statusTxt, xhr){
         if(statusTxt == "success"){
           // Transform language codes
@@ -87,8 +90,20 @@ function load_document (p, v){
     });
   $("#doc_view").attr('href', "/doc/show?p="+p+"&v="+v);
   $('#doc_view').css('display', 'inline-block');
+  $("#add_page_semantic").attr('href', "/page_semantic?p="+p+"&v="+v);
+  $('#add_page_semantic').css('display', 'inline-block');
   $('div.active').removeClass("active");
   $('#vol-'+v+'-page-'+p).addClass("active");
+  setTimeout(function () {
+    $(".word").popover({'title': function () {
+      return getTitle(this);
+    }, 
+    'content': function () {
+      return getTranslation(this);
+    }, 
+    'html': true,
+    'container': 'body'});  
+  }, 1000);
 }
 
 function Download(url) {

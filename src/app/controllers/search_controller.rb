@@ -1,14 +1,19 @@
+require 'will_paginate/array'
+
 class SearchController < ApplicationController
 
   def chart_wordstart_date
     if params[:term]
-      # Strip white-space at the beginning and the end.
-      query = params[:term].strip.gsub(/[^0-9a-z]/i, '')
+      term = params[:term]
+      parts = term.split(", ")
 
-      # Do not use autocomplete for phrases; The search method is not appropriate
-      # if query.length < 20 and !query.include? ' '
-         render json: (
-          Search.search(query, {
+      data = []
+
+      parts.each do |part|
+        # Strip white-space at the beginning and the end.
+        query = part.gsub(/[^0-9a-z]/i, '')
+
+        docs = Search.search(query, {
              fields: ['content'], # Autocomplete for words in content
              match: :word_start, # Use word_start method
              highlight: {tag: "" ,
@@ -20,22 +25,25 @@ class SearchController < ApplicationController
                below: 4, # Do not use misspellings if there are more than 4 results
                transpositions: false # Show more accurate results
              }
-           }
-          # Get only the highlighted word
-          # Remove non-aplhanumeric characters, such as white-space
-          # Return only unique words
-          ).pluck(:highlighted_content, :date, :entry)
+           })
+
+        data += docs.results
+      end
+      
+
+      # Do not use autocomplete for phrases; The search method is not appropriate
+      # if query.length < 20 and !query.include? ' '
+         render json: data.pluck(:highlighted_content, :date, :entry)
            .delete_if{|content, date, entry| not content or not date or not entry}
            .collect{
              |content, date, entry| [
-               content.gsub(/[^0-9a-z]/i, ''),
+               content.gsub(/[^0-9a-z]/i, '').downcase,
                '',
                "<span style=\"margin:5px;\"><b>ID:</b> #{entry}</span><br><span style=\"margin:5px;\"><b>Date:</b> #{date}</span>",
                date,
                date
                ]
              }
-        )
        return # Finish here to avoid render {}
       # end
     end
@@ -44,9 +52,15 @@ class SearchController < ApplicationController
 
   def chart_data
     if params[:term]
-      query = params[:term].strip.gsub(/[^0-9a-z]/i, '')
+      term = params[:term]
+      parts = term.split(", ")
 
-      results = Search.search(query, {
+      data = []
+
+      parts.each do |part|
+        query = part.strip.gsub(/[^0-9a-z]/i, '')
+
+        docs = Search.search(query, {
           fields: ['content'], # Autocomplete for words in content
           match: :word_start, # Use word_start method
           highlight: {tag: "" ,
@@ -58,8 +72,12 @@ class SearchController < ApplicationController
             below: 4, # Do not use misspellings if there are more than 4 results
             transpositions: false # Show more accurate results
           }
-        }
-      ).pluck(:date, :entry)
+        })
+
+        data += docs.results
+      end
+
+      results = data.pluck(:date, :entry)
 
       results.each do |r|
         if !r[0].nil?
@@ -67,8 +85,8 @@ class SearchController < ApplicationController
         end
       end
 
-      data = results.group_by {|year, record| year}.map {|year, match| [year, match.count]}
-      render json: (data)
+      final_data = results.sort_by{|r| r[0]}.group_by {|year, record| year}.map {|year, match| [year, match.count]}
+      render json: (final_data)
       return      
     end
     render json: {}
@@ -105,9 +123,10 @@ class SearchController < ApplicationController
         end
 
     else
+      @queries = [@query]
+
       @documents = Search.search @query,
           misspellings: {edit_distance: @misspellings,transpositions: false},
-          page: permited[:page], per_page: @results_per_page, # Pagination
           where: get_adv_search_params(permited), # Parse adv search parameters
           match: get_serch_method(permited), # Parse search method parameter
           order: get_order_by(permited), # Parse order_by parameter
@@ -116,16 +135,158 @@ class SearchController < ApplicationController
           suggest: true, # Enable suggestions
           load: false # Do not retrieve data from PostgreSQL
     
+      if @query_lat != ""
+        @queries << @query_lat
+        @documents_lat = Search.search @query_lat,
+          misspellings: {edit_distance: @misspellings,transpositions: false},
+          where: get_adv_search_params(permited), # Parse adv search parameters
+          match: get_serch_method(permited), # Parse search method parameter
+          order: get_order_by(permited), # Parse order_by parameter
+          highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          load: false # Do not retrieve data from PostgreSQL
+      end
+
+      if @query_sc != ""
+        @queries << @query_sc
+        @documents_sc = Search.search @query_sc,
+          misspellings: {edit_distance: @misspellings,transpositions: false},
+          where: get_adv_search_params(permited), # Parse adv search parameters
+          match: get_serch_method(permited), # Parse search method parameter
+          order: get_order_by(permited), # Parse order_by parameter
+          highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          load: false # Do not retrieve data from PostgreSQL
+      end
+
+      if @query_d != ""
+        @queries << @query_d
+        @documents_d = Search.search @query_d,
+          misspellings: {edit_distance: @misspellings,transpositions: false},
+          where: get_adv_search_params(permited), # Parse adv search parameters
+          match: get_serch_method(permited), # Parse search method parameter
+          order: get_order_by(permited), # Parse order_by parameter
+          highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          load: false # Do not retrieve data from PostgreSQL
+      end
+
       @images = []
     
-      @documents.each do |document|
+      @total_length = @documents.total_count
+      @took = @documents.took
+      @documents_arr = @documents.results
+
+      unless @documents_lat.nil?
+        @total_length += @documents_lat.total_count
+        @took += @documents_lat.took
+        @documents_arr += @documents_lat.results
+      end
+
+      unless @documents_sc.nil?
+        @total_length += @documents_sc.total_count
+        @took += @documents_sc.took
+        @documents_arr += @documents_sc.results
+      end
+
+      unless @documents_d.nil?
+        @total_length += @documents_d.total_count
+        @took += @documents_d.took
+        @documents_arr += @documents_d.results
+      end
+
+      if @orderBy == 0
+        @documents_arr.sort_by! {|d| [d.volume, d.page]}
+      elsif @orderBy == 2
+        @documents_arr.sort_by! {|d| [d.volume, d.page]}.reverse!
+      elsif @orderBy == 3
+        @documents_arr.sort_by! {|d| [d.date]}
+      end
+
+      @page = permited[:page]
+      if @page.nil?
+        @page = 1
+      end
+
+      @documents_pagination = WillPaginate::Collection.create(@page.to_i, @results_per_page, @documents_arr.length) do |pager|
+        pager.replace @documents_arr
+      end
+
+      start = (@page.to_i - 1) * @results_per_page
+
+      @documents_page = @documents_arr[start, @results_per_page]
+
+      @documents_arr.each do |document|
         image = PageImage.find_by_volume_and_page(document.volume, document.page)
         if image
-          @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+          @images << [image.image.normal.url.split('.')[0...-1].join + '.jpeg', document.volume, document.page]
+        end
+      end
+
+      @image_set = Set.new(@images)
+    end
+  end
+
+
+  def search_annotation
+
+    # Use strong params
+    permited = simple_search_params
+
+    # Parse Spelling variants and Results per page
+    get_search_tools_params(permited)
+    search_query = ""
+    terms = params[:term]
+    term_values = params[:term_value]
+    search_array = []
+    if terms.eql?([""])
+      search_query = '*'
+    else
+      terms.each_with_index do |term, i|
+        unless term.empty?
+          if term_values[i].empty?
+            term_values[i] = " "
+          end
+            search_array << "<#{term}>#{term_values[i]}</#{term}>"
+        end
+      end
+      search_query = search_array.join(" ")
+    end
+
+
+    @documents = Search.search search_query,
+          order: get_order_by(permited), # Parse order_by parameter
+          #highlight: {tag: "<mark>"}, # Set html tag for highlight
+          fields: ['content'], # Search for the query only within content
+          load: false # Do not retrieve data from PostgreSQL
+    @documents = @documents.results
+
+    unless params[:verdict].empty?
+      @documents = @documents.select do |document|
+        unless document.verdict.nil?
+          document.verdict.include?(params[:verdict].to_i)
         end
       end
     end
+
+    unless params[:offence].empty?
+      @documents = @documents.select do |document|
+        unless document.offence.nil?
+          document.offence.include?(params[:offence].to_i)
+        end
+      end
+    end
+
+    unless params[:sentence].empty?
+      @documents = @documents.select do |document|
+        unless document.sentence.nil?
+          document.sentence.include?(params[:sentence].to_i)
+        end
+      end
+    end
+
   end
+
 
   def autocomplete
     # Strip white-space at the beginning and the end.
@@ -174,22 +335,79 @@ class SearchController < ApplicationController
 
   def get_search_tools_params(permited)
     # Get text from the user input. In case of empty search -> use '*'
-    en_to_lat = Hash.new
-    en_to_lat["begin"] = "incipiunt"
-    en_to_lat["feast"] = "festum"
-    en_to_lat["before"] = "ante"
-    en_to_lat["aberdeen"] = "aberdene"
-
- 
     @query = permited[:q].present? ? permited[:q].strip : '*'
-    arr_query = @query.split
-    arr_query.each_with_index do |word, index|
-	if en_to_lat.key?(word.downcase)
-		arr_query[index] = en_to_lat[word.downcase]
-	end
+    
+    @query_lat = ""
+    tr = Translation.find_by language: "latin", translated: @query
+
+    if tr.nil?
+      if @query.include? " "
+        query_lat = permited[:q].present? ? permited[:q].strip : '*'
+        parts = @query.split(" ")
+        parts.each do |part|
+          tr = Translation.find_by language: "latin", translated: part
+
+          unless tr.nil?
+            query_lat.gsub!(part, tr.word)
+          end
+        end
+        unless query_lat.eql? @query
+          @query_lat = query_lat
+        end
+      end
+    else
+      unless tr.word.eql? @query
+        @query_lat = tr.word
+      end
     end
 
-    @query = arr_query.join(' ')
+    @query_sc = ""
+    tr = Translation.find_by language: "scots", translated: @query
+
+    if tr.nil?
+      if @query.include? " "
+        query_sc = permited[:q].present? ? permited[:q].strip : '*'
+        parts = @query.split(" ")
+        parts.each do |part|
+          tr = Translation.find_by language: "scots", translated: part
+
+          unless tr.nil?
+            query_sc.gsub!(part, tr.word)
+          end
+        end
+        unless query_sc.eql? @query
+          @query_sc = query_sc
+        end
+      end
+    else
+      unless tr.word.eql? @query
+        @query_sc = tr.word
+      end
+    end
+
+    @query_d = ""
+    tr = Translation.find_by language: "dutch", translated: @query
+
+    if tr.nil?
+      if @query.include? " "
+        query_d = permited[:q].present? ? permited[:q].strip : '*'
+        parts = @query.split(" ")
+        parts.each do |part|
+          tr = Translation.find_by language: "dutch", translated: part
+
+          unless tr.nil?
+            query_d.gsub!(part, tr.word)
+          end
+        end
+        unless query_d.eql? @query
+          @query_d = query_d
+        end
+      end
+    else
+      unless tr.word.eql? @query
+        @query_d = tr.word
+      end
+    end
 
     # Get the number of results per page; Default value -> 5
     @results_per_page = 5
@@ -215,10 +433,10 @@ class SearchController < ApplicationController
     @orderBy = permited[:o].to_i
     order_by = {}
     if @orderBy == 0
-      order_by['_score'] = :desc # most relevant first - default
-    elsif @orderBy == 1
       order_by['volume'] = :asc # volume ascending order
       order_by['page'] = :asc # page ascending order
+    elsif @orderBy == 1
+      order_by['_score'] = :desc # most relevant first - default
     elsif @orderBy == 2
       order_by['volume'] = :desc # volume descending order
       order_by['page'] = :desc # page descending order

@@ -1,0 +1,23 @@
+<% @usrnote.each do |note| %>
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<div class="row">
+					<div class="col-sm-3"><h4>Note Volume: <%= note.search_volume %></h4></div>
+					<div class="col-sm-3"><h4>Note Page: <%= note.search_page %></h4></div>
+					
+					<div class="col-sm-3">
+					<a href="/doc/show?p=<%= note.search_page %>&amp;v=<%= note.search_volume %>" id="doc_view" class="btn btn-primary" style="display: inline-block;">
+	         		<i class="fa fa-book"></i>View Page
+	        		</a>
+	        		</div>
+
+					<div class="col-sm-1"><%= form_tag("/notes/#{note.id}", method:"delete") do %>
+						<input type="submit" value="Delete" class="btn btn-danger">
+					<% end %>
+					</div>
+			</div>
+		</div>
+
+		<h4><%= note.content %></h4>
+	</div>
+<% end %>

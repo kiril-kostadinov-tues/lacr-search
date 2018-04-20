@@ -37,6 +37,8 @@ Rails.application.routes.draw do
   get 'ajax/search/autocomplete-entry', to: 'search#autocomplete_entry'
   get 'ajax/search/chart/worddate', to: 'search#chart_wordstart_date'
   get 'ajax/search/chart/data', to: 'search#chart_data'
+  get 'ajax/translate/get/:lang/:word', to: 'translation#get'
+  post 'ajax/translate/modify/:lang/:word', to: 'translation#edit'
 
   # Search routes
   get 'search', to: 'search#search'
@@ -45,10 +47,27 @@ Rails.application.routes.draw do
   post 'post', to: 'comment#post'
   
   # Semantic search routes
-  get 'semantic_search', to: 'semantic_search#index'
-  post 'semantic_search', to: 'semantic_search#show'
+  get 'semantic_search', to: 'semantic_search#index'  
+  post 'semantic_search_page', to: 'semantic_search#show'
+  post 'semantic_search_word', to: 'search#search_annotation'
+  get 'word_semantic', to: 'semantic_search#show_word_semantic'
+  post 'word_semantic', to: 'semantic_search#word_semantic'
+  get 'page_semantic', to: 'semantic_search#show_page_semantic'
+  patch 'page_semantic', to: 'semantic_search#page_semantic_patched'
+  post 'semantic_search/create', to: 'semantic_search#create'
+  post 'create_offence', to: 'semantic_search#create_offence'
+  post 'create_verdict', to: 'semantic_search#create_verdict'
+  post 'create_sentence', to: 'semantic_search#create_sentence'
+  post 'create_category', to: 'semantic_search#create_category'
+  delete 'annotation_delete', to: 'semantic_search#delete_annotation'
 
   # Update lines
   get '/update_lines', to: 'lines#update_lines'
   post '/update_lines', to: 'lines#do_update'
+
+  post 'notes/create', to: 'note#create'
+  get '/notes', to: 'note#index'
+
+  delete 'notes/:id', to: 'note#destroy'
+  delete 'comments/:id', to: 'comment#destroy'
 end

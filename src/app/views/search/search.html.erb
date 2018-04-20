@@ -11,35 +11,60 @@
       </label>
     </div>
     <div class="col-xs-6 text-right">
-      <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
+      <span><%= @total_length %> <%if @total_length == 1 %>result<% else %>results<%end%> (<%= @took / 1000.0 %> sec)</span>
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Charts</button>
     </div>
     <%else%>
     <div class="col-xs-12 text-right">
-      <span><%= @documents.total_count %> <%if @documents.total_count == 1 %>result<% else %>results<%end%> (<%= @documents.took / 1000.0 %> sec)</span>
+      <span><%= @total_length %> <%if @total_length == 1 %>result<% else %>results<%end%> (<%= @took / 1000.0 %> sec)</span>
       <button type="button" name="Toggle Gallery" id="toggle-gallery" class="btn btn-sm btn-primary">
         <%= fa_icon "eye", text: "Toggle Gallery" %>
       </button>
-      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Timeline</button>
+      <button type="button" id="toggleChart-1" style="display:none;" class="btn btn-sm btn-primary" onclick="loadChart();">Toggle Charts</button>
     </div>
     <%end%>
     
   </div>
 <%rescue%>
 <%end%>
-<% if @documents.length > 0 %>
+<% if @documents_page.length > 0 %>
   <div class="row">
-    <div class="text-center">
-       <div id="chart-1" style="visibility: hidden; height: 0"></div>
-       <div id="pie-chart" style="visibility: hidden; height: 0"></div>
-       <div id="bar-chart" style="visibility: hidden; height: 0"></div>
+    <div id="chart-tabs" class="text-center" style="visibility: hidden;">
+      <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link" id="histogram-tab" data-toggle="tab" href="#histogram" role="tab" aria-controls="histogram" aria-selected="false">
+            Histogram
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pie-chart-tab" data-toggle="tab" href="#pieChart" role="tab" aria-controls="pieChart" aria-selected="false">
+            Pie Chart
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="timeline-tab" data-toggle="tab" href="#timeline" role="tab" aria-controls="timeline" aria-selected="true">
+            Timeline
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade" id="histogram" role="tabpanel" aria-labelledby="histogram-tab">
+          <div id="bar-chart" style="visibility: hidden; height: 0"></div>      
+        </div>
+        <div class="tab-pane fade" id="pieChart" role="tabpanel" aria-labelledby="pie-chart-tab">
+          <div id="pie-chart" class="col-md-offset-4" style="visibility: hidden; height: 0"></div>
+        </div>
+        <div class="tab-pane fade show" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
+          <div id="chart-1" style="visibility: hidden; height: 0"></div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="res" class="list-group">
-    <% @documents.each do |document| %>
+    <% @documents_page.each do |document| %>
     <% begin highlighted = "&highlight="+Nokogiri::HTML.fragment(document.highlighted_content).css('mark').collect(&:text).uniq.join('+') rescue highlighted = "" end%>
 
     <a class="list-group-item" href="<%= doc_show_path%>?p=<%=document.page%>&v=<%=document.volume%><%=highlighted%>">
@@ -58,14 +83,18 @@
   </div>
   <div id="gallery" class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6" style="visibility: hidden; height: 0">
     <div id="flipbook">
-      <% @images.each do |image| %>
-        <%= image_tag(image) %>
+      <% @image_set.each do |image| %>
+        <div>
+          <a href="/doc/show?p=<%= image[2] %>&v=<%= image[1] %>">
+            <%= image_tag(image[0], style: "max-width:100%;max-height:100%;") %>
+          </a>
+        </div>
       <% end %>
     </div>
   </div>
   <div class="row">
     <div class="text-center">
-      <%= will_paginate @documents, renderer: BootstrapPagination::Rails %>
+      <%= will_paginate @documents_pagination, renderer: BootstrapPagination::Rails %>
     </div>
   </div>
 
@@ -110,13 +139,13 @@
   </div>
   </div>
 
-<% if @documents.length > 0 %>
+<% if @documents_arr.length > 0 %>
 <% content_for :javascript_includes do %>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <%= javascript_include_tag "search.js" %>
   <script type="text/javascript">
-    loadChart('<%= ajax_search_chart_worddate_path(:term => @query)%>');
-    loadPieData('<%= ajax_search_chart_data_path(:term => @query)%>');
+    loadChart('<%= ajax_search_chart_worddate_path(:term => @queries.join(", "))%>');
+    loadPieData('<%= ajax_search_chart_data_path(:term => @queries.join(", "))%>');
   </script>
 <%end%>
 <%end%>
@@ -124,7 +153,7 @@
 <script>
   $("#flipbook").turn({
     width: 800,
-    height: 600,
+    height: 528,
     autoCenter: true
   });
 </script>

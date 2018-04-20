@@ -57,7 +57,11 @@
 <div id="gallery" class="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6" style="visibility: hidden; height: 0">
   <div id="flipbook">
     <% @images.each do |image| %>
-      <%= image_tag(image) %>
+      <div>
+        <a href="/doc/show?p=<%= image[2] %>&v=<%= image[1] %>">
+          <%= image_tag(image[0], style: "max-width:100%;max-height:100%;") %>
+        </a>
+      </div>
     <% end %>
   </div>
 </div>
@@ -67,11 +71,96 @@
 <script>
   $("#flipbook").turn({
     width: 800,
-    height: 600,
+    height: 528,
     autoCenter: true
   });
 </script>
 
 <% content_for :javascript_includes do %>
   <%= javascript_include_tag "documents_browse.js" %>
+  <%= javascript_include_tag "get_selection.js" %>
+  <script type="text/javascript">
+    selectedWord = function(){
+      $(".word").val(getSelectionText);
+    };
+
+    showEditForm = function () {
+      $("#meaning").hide();
+      $("#actions").hide();
+      $("#add-new").show();
+      $('#input-meaning').focus();
+    }
+
+    submitTranslation = function (word, language) {
+      translation = $("#input-meaning").val();
+
+      $.ajax({type: "POST", url: '/ajax/translate/modify/' + language + '/' + word, data: {translated: translation}, success: function (result) {
+        $('#input-meaning').val(translation);
+        $('#add-new').hide();
+        $('#result').text(translation);
+        $('#meaning').show();
+        $('#actions').show();
+      }})
+    }
+
+    getTitle = function (src) {
+      return $(src).text();
+    };
+
+    getTranslation = function (src) {
+      word = $(src).text().toLowerCase();
+      language = $(src).closest(".panel-primary").find("span.pr-language").text().toLowerCase();
+
+      if(language === "middle scots") {
+        language = "scots";
+      }
+
+      res = $.ajax({url: '/ajax/translate/get/' + language + '/' + word, success: function (result) {
+        setTimeout(function () {
+
+          if(result === null) {
+            $("#result").text("No translation available")
+          } else {
+            $("#result").text(result.translated);
+            $("#input-meaning").val(result.translated); 
+          } 
+        }, 300);
+      }});
+
+      markup = '<div><div id="meaning"><p id="result"></p></div><div id="actions">';
+
+      <% if user_signed_in? %>
+        <% if current_user.admin %>
+          markup += '<button type="button" class="btn btn-link" onclick="showEditForm()">Add/Edit Translation</button>';
+        <% end %>
+      <% end %> 
+
+      markup += '<a target="_blank" href="';
+
+      if(language === "scots") {
+        markup += 'http://www.dsl.ac.uk/results/' + word;
+      } else if(language === "latin") {
+        markup += 'https://translate.google.com/#la/en/' + word;
+      } else {
+        markup += 'https://translate.google.com/#nl/en/' + word;
+      }
+
+          markup += '">Check Online</a></div>';
+
+          <% if user_signed_in? %>
+        <% if current_user.admin %>
+          markup += '<div id="add-new" style="display: none"><input type="text" name="meaning" class="form-control" id="input-meaning"><br><button type="button" class="btn btn-primary" onclick="submitTranslation(\'';
+
+
+              markup += word + '\', \'' + language;
+
+              markup += '\')">Submit</button></div>';
+        <% end %>
+      <% end %> 
+
+      markup += '</div>';
+
+      return markup;
+    };
+  </script>
 <% end %>

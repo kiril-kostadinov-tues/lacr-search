@@ -15,6 +15,10 @@ ActiveRecord::Schema.define(version: 20180419055857) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "annotations", force: :cascade do |t|
+    t.string "name"
+  end
+
   create_table "comments", force: :cascade do |t|
     t.text     "content"
     t.integer  "user_id"
@@ -40,6 +44,20 @@ ActiveRecord::Schema.define(version: 20180419055857) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "notes", force: :cascade do |t|
+    t.integer  "search_volume"
+    t.integer  "search_page"
+    t.integer  "search_paragraph"
+    t.integer  "user_id"
+    t.text     "content"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "offences", force: :cascade do |t|
+    t.string "name"
+  end
+
   create_table "page_images", force: :cascade do |t|
     t.jsonb    "image"
     t.integer  "volume"
@@ -62,11 +80,18 @@ ActiveRecord::Schema.define(version: 20180419055857) do
     t.text     "content"
     t.date     "date"
     t.string   "date_incorrect"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "offence",              default: [],              array: true
+    t.integer  "verdict",              default: [],              array: true
+    t.integer  "sentence",             default: [],              array: true
     t.index ["page"], name: "index_searches_on_page", using: :btree
     t.index ["paragraph"], name: "index_searches_on_paragraph", using: :btree
     t.index ["volume"], name: "index_searches_on_volume", using: :btree
+  end
+
+  create_table "sentences", force: :cascade do |t|
+    t.string "name"
   end
 
   create_table "tr_paragraphs", force: :cascade do |t|
@@ -85,6 +110,14 @@ ActiveRecord::Schema.define(version: 20180419055857) do
     t.index ["filename"], name: "index_transcription_xmls_on_filename", unique: true, using: :btree
   end
 
+  create_table "translations", force: :cascade do |t|
+    t.string   "word"
+    t.string   "language"
+    t.string   "translated"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "",    null: false
     t.string   "encrypted_password",     default: "",    null: false
@@ -101,6 +134,10 @@ ActiveRecord::Schema.define(version: 20180419055857) do
     t.boolean  "admin",                  default: false
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  end
+
+  create_table "verdicts", force: :cascade do |t|
+    t.string "name"
   end
 
   add_foreign_key "searches", "tr_paragraphs", on_delete: :cascade

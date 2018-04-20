@@ -12,15 +12,17 @@ class DocumentsController < ApplicationController
     @documents.each do |document|
       image = PageImage.find_by_volume_and_page(document.volume, document.page)
       if image
-        @images << image.image.normal.url.split('.')[0...-1].join + '.jpeg'
+        @images << [image.image.normal.url.split('.')[0...-1].join + '.jpeg', document.volume, document.page]
       end
     end
   end
 
   def selected
     selected_entries = cookies[:selected_entries]
+    @selected_page = true
     if selected_entries
-      @documents = Search.where({entry: selected_entries.split(',')})
+      @documents = Search.where({entry: selected_entries.split(',')}).order(:date)
+      @exclude_comments = true
       if @documents.length == 0
         cookies.delete :selected_entries
         redirect_to doc_path, :alert => "No selected paragraphs!"
@@ -102,6 +104,12 @@ class DocumentsController < ApplicationController
       @volume, @page = params[:v].to_i, params[:p].to_i
       # Select Documents
       @documents = Search.order(:paragraph).where('volume' => @volume).rewhere('page' => @page)
+
+      @xmlcontent = []
+      @documents.each do |document|
+        @xmlcontent << document.content
+      end
+
       if @documents.length > 0
         # Select image
         respond_to do |format|
@@ -120,12 +128,12 @@ class DocumentsController < ApplicationController
       and params[:v].to_i > 0 and  params[:v].to_i < 1000000 \
       and params[:p].to_i > 0 and  params[:p].to_i < 1000000
       # Store the volume and page from the input
-      @volume, @page = params[:v].to_i, params[:p].to_i
+      @volume, @page, @paragraph = params[:v].to_i, params[:p].to_i, params[:paragraph].to_i
       # Select Documents
       @documents = Search.order(:paragraph).where('volume' => @volume).rewhere('page' => @page)      
       @comments = Comment.where("search_volume = ? AND search_page = ?", @volume, @page)
       @lines = Line.where('volume' => @volume).rewhere('page' => @page)
-
+      @notes = Note.where("search_volume = ? AND search_page = ?", @volume, @page)
       if @documents.length > 0
         # Select image
         page_image = PageImage.find_by_volume_and_page(@volume, @page)

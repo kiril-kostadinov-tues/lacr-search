@@ -17,8 +17,11 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # Show the selected documents
   def selected
     selected_entries = cookies[:selected_entries]
+
+    # Disables the display of comments and notes on _page.html.erb
     @selected_page = true
     if selected_entries
       @documents = Search.where({entry: selected_entries.split(',')}).order(:date)
@@ -57,6 +60,7 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # Perform the editing of XML data
   def edit_finished
     if user_signed_in? and current_user.admin?
       xml = params[:transcription_xml][:new_xml]
@@ -64,9 +68,12 @@ class DocumentsController < ApplicationController
       @new_text.content_xml = xml
       @new_text.save
       @new_text = TrParagraph.find(params[:edited_document_id])
+      
+      # Convert the newly-edited XML to valid HTML
       new_html = Nokogiri::XML(xml) 
       xml_to_html(new_html) 
       @new_text.content_html = new_html
+      
       @new_text.save
       redirect_to doc_path
       flash[:notice] = "Document successfully edited!"

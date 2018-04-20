@@ -12,6 +12,8 @@ class LinesController < ApplicationController
 
 		    user = "teamcharlielacr@gmail.com"
 		    pw = "lacrsearch2"
+
+		    # Create a new async job
 		    AddLinesJob.perform_later(user,pw,vol,page,pages[0].collId,pages[0].docId)
       		flash[:notice] = "The lines are updated"
       		redirect_to :back

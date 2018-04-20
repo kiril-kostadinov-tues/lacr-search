@@ -3,6 +3,7 @@
 var chartData = [];
 var pieData = [];
 
+// Hide other visual elements and show page gallery
 function toggle_gallery () {
   if ($('#gallery').css('visibility') === 'hidden') {
     $('#res').fadeToggle();
@@ -17,6 +18,7 @@ function toggle_gallery () {
       
 }
 
+// Load chart data using AJAX and initialize the charts
 var loadChart = function (chartAPI) {
   chartAPI = (chartAPI !== 'undefined') ? chartAPI : "";
 
@@ -44,6 +46,7 @@ var loadChart = function (chartAPI) {
     }
   }
   else if ($('#chart-1').css('visibility') === 'hidden') {
+    // Data has been loaded, but the charts are not currently visible
     google.charts.load('current', {'packages':['timeline', 'corechart']});
     google.charts.setOnLoadCallback(drawChart);
     google.charts.setOnLoadCallback(drawPie);
@@ -121,6 +124,7 @@ var loadChart = function (chartAPI) {
   }
 };
 
+// Use AJAX to load data for the Pie Chart and Histogram
 var loadPieData = function (pieChartAPI) {
   pieChartAPI = (pieChartAPI !== 'undefined') ? pieChartAPI : "";
 

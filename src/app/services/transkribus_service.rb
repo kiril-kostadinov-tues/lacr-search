@@ -8,6 +8,7 @@ class TranskribusService
 		@sessionId = ""
 	end
 
+	# Login into Transkribus
 	def tr_login(user,password)
 		req_params = {:user => user, :pw => password}
 		uri = URI("https://transkribus.eu/TrpServer/rest/auth/login")
@@ -25,7 +26,7 @@ class TranskribusService
   	#  return http.request(req)
   	#end
 
-
+  	# Wait for a job to complete
 	def tr_wait_job(jobId)
 		finished = false
 
@@ -40,6 +41,7 @@ class TranskribusService
 		end
 	end
 
+	# Create the structure necessary to upload an image into Transkribus
 	def tr_create_upload(collId,fname)
 	    url = URI.parse("https://transkribus.eu/TrpServer/rest/uploads")
 	    sess_params = {:collId => collId, :JSESSIONID => @sessionId}
@@ -52,6 +54,7 @@ class TranskribusService
 	    return Nokogiri::XML(http.request(req).body).xpath('//uploadId')[0].to_s[/\>(.*?)</,1]
 	end
 
+	# Upload an image to Transkribus
 	def tr_upload(uploadId,fname,filepath)
 		url = URI("https://transkribus.eu/TrpServer/rest/uploads/#{uploadId}?JSESSIONID="+@sessionId)
 		http = Net::HTTP.new(url.host,url.port)
@@ -62,7 +65,7 @@ class TranskribusService
 		return Nokogiri::XML(http.request(request).body).xpath('//jobId')[0].to_s[/\>(.*?)</,1] #jobId
 	end
 
-
+	# Delete a document (containing an image) from Transkribus
 	def tr_delete_doc(collId,docId)
 		url = URI("https://transkribus.eu/TrpServer/rest/collections/#{collId}/#{docId}?JSESSIONID="+@sessionId)
 		http = Net::HTTP.new(url.host,url.port)
@@ -73,6 +76,7 @@ class TranskribusService
 		return response.code
 	end
 
+	# Perform Layout Analysis on an image
 	def tr_LA(collId,docId,pageId)
 		url = URI("https://transkribus.eu/TrpServer/rest/LA")
 		sess_params = {:JSESSIONID => @sessionId, :collId => collId, :doBlockSeg => true, :doLineSeg => true, :doWordSeg =>false, :jobImpl => "CITlabAdvancedLaJob", :doCreateJobBatch => false}
@@ -85,7 +89,7 @@ class TranskribusService
 		return Nokogiri::XML(http.request(req).body).xpath('//jobId')[0].to_s[/\>(.*?)</,1] #jobId
 	end
 
-
+	# Get the metadata for the given document. Includes transcriptions and line coordinates.
 	def tr_fulldoc(collId,docId)
 		url = URI("https://transkribus.eu/TrpServer/rest/collections/#{collId}/#{docId}/fulldoc?JSESSIONID="+@sessionId)
 		http = Net::HTTP.new(url.host,url.port)
@@ -99,6 +103,7 @@ class TranskribusService
 		end
 	end
 
+	# Get simplified coordinates for a line
 	def get_line_coords(linesUrl)
 		url = URI(linesUrl)
 		http = Net::HTTP.new(url.host,url.port)
@@ -107,6 +112,7 @@ class TranskribusService
 		return http.request(req)
 	end
 
+	# Delete line info from the database
 	def destroy_lines(volume,page)
 		lines = Line.where('volume' => volume).rewhere('page' => page)
 		lines.each do |line|
@@ -114,7 +120,7 @@ class TranskribusService
 		end
 	end
 
-
+	# Updates PageImage information
 	def add_doc_to_page_image(vol, page, collId, docId, tsId)
 		page = PageImage.find_by_volume_and_page(vol, page)
 		page.collId = collId
@@ -127,6 +133,7 @@ class TranskribusService
 		end
 	end
 
+	# Add line info to the database
 	def add_lines(vol, page, collId, docId)
 		tr = tr_fulldoc(collId,docId)['pageList']['pages'][0]['tsList']['transcripts'][0]
 		linesUrl = tr['url']

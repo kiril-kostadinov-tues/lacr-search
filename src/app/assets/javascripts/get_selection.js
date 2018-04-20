@@ -1,4 +1,6 @@
 //= require ISO_639_2.min.js
+
+// Get the currently highlighted text on the page
 function getSelectionText() {
     var text = "";
     if (window.getSelection) {

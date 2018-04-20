@@ -1,6 +1,7 @@
 class UploadJob < ApplicationJob
 	queue_as :default
 
+	# Upload an image to Transkribus
 	def perform(user,password,volume,page,collId,fname,filepath)
 		transkribus = TranskribusService.new()
 		transkribus.tr_login(user,password)

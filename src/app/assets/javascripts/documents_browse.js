@@ -1,6 +1,7 @@
 //= require ISO_639_2.min.js
 var $selected = {};
 
+// Hide other visual elements and show page gallery
 function toggle_gallery () {
   if ($('#gallery').css('visibility') === 'hidden') {
     $('#doc-browse').fadeToggle();

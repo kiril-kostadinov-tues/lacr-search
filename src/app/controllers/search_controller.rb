@@ -125,6 +125,7 @@ class SearchController < ApplicationController
     else
       @queries = [@query]
 
+      # Search fo the original query entered by the user
       @documents = Search.search @query,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -136,7 +137,9 @@ class SearchController < ApplicationController
           load: false # Do not retrieve data from PostgreSQL
     
       if @query_lat != ""
+        # Add Latin to the list of successful translations
         @queries << @query_lat
+        # Perform a search for the Latin translation
         @documents_lat = Search.search @query_lat,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -148,7 +151,9 @@ class SearchController < ApplicationController
       end
 
       if @query_sc != ""
+        # Add Middle Scots to the list of successful translations
         @queries << @query_sc
+        # Perform a search for the Middle Scots translation
         @documents_sc = Search.search @query_sc,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -160,7 +165,9 @@ class SearchController < ApplicationController
       end
 
       if @query_d != ""
+        # Add Dutch to the list of successful translations
         @queries << @query_d
+        # Perform a search for the Dutch translation
         @documents_d = Search.search @query_d,
           misspellings: {edit_distance: @misspellings,transpositions: false},
           where: get_adv_search_params(permited), # Parse adv search parameters
@@ -195,10 +202,13 @@ class SearchController < ApplicationController
         @documents_arr += @documents_d.results
       end
 
+      # Sort by volume, page - ascending
       if @orderBy == 0
         @documents_arr.sort_by! {|d| [d.volume, d.page]}
+      # Sort by volume, page - descending
       elsif @orderBy == 2
         @documents_arr.sort_by! {|d| [d.volume, d.page]}.reverse!
+      # Sort by date
       elsif @orderBy == 3
         @documents_arr.sort_by! {|d| [d.date]}
       end
@@ -208,14 +218,17 @@ class SearchController < ApplicationController
         @page = 1
       end
 
+      # Create custom pagination for the array
       @documents_pagination = WillPaginate::Collection.create(@page.to_i, @results_per_page, @documents_arr.length) do |pager|
         pager.replace @documents_arr
       end
 
       start = (@page.to_i - 1) * @results_per_page
 
+      # Truncate the array to only contain the elements on the current page
       @documents_page = @documents_arr[start, @results_per_page]
 
+      # Collect all results images for the gallery
       @documents_arr.each do |document|
         image = PageImage.find_by_volume_and_page(document.volume, document.page)
         if image
@@ -227,7 +240,7 @@ class SearchController < ApplicationController
     end
   end
 
-
+  # Perform semantic search
   def search_annotation
 
     # Use strong params
@@ -240,8 +253,10 @@ class SearchController < ApplicationController
     term_values = params[:term_value]
     search_array = []
     if terms.eql?([""])
+      # Search for all if the term fields are empty
       search_query = '*'
     else
+      # Construct each term and add it to the query
       terms.each_with_index do |term, i|
         unless term.empty?
           if term_values[i].empty?
@@ -254,6 +269,7 @@ class SearchController < ApplicationController
     end
 
 
+    # Perform a search for the constructed query
     @documents = Search.search search_query,
           order: get_order_by(permited), # Parse order_by parameter
           #highlight: {tag: "<mark>"}, # Set html tag for highlight
@@ -261,6 +277,7 @@ class SearchController < ApplicationController
           load: false # Do not retrieve data from PostgreSQL
     @documents = @documents.results
 
+    # Check if user wants to filter by verdict
     unless params[:verdict].empty?
       @documents = @documents.select do |document|
         unless document.verdict.nil?
@@ -269,6 +286,7 @@ class SearchController < ApplicationController
       end
     end
 
+    # Check if user wants to filter by offence
     unless params[:offence].empty?
       @documents = @documents.select do |document|
         unless document.offence.nil?
@@ -277,6 +295,7 @@ class SearchController < ApplicationController
       end
     end
 
+    # Check if user wants to filter by sentence
     unless params[:sentence].empty?
       @documents = @documents.select do |document|
         unless document.sentence.nil?
@@ -338,12 +357,14 @@ class SearchController < ApplicationController
     @query = permited[:q].present? ? permited[:q].strip : '*'
     
     @query_lat = ""
+    # Check for translation of whole phrase in Latin
     tr = Translation.find_by language: "latin", translated: @query
 
     if tr.nil?
       if @query.include? " "
         query_lat = permited[:q].present? ? permited[:q].strip : '*'
         parts = @query.split(" ")
+        # Search for word-by-word translations in Latin
         parts.each do |part|
           tr = Translation.find_by language: "latin", translated: part
 
@@ -352,6 +373,7 @@ class SearchController < ApplicationController
           end
         end
         unless query_lat.eql? @query
+          # Avoid duplicating queries if word in Latin is the same as in English
           @query_lat = query_lat
         end
       end
@@ -362,6 +384,7 @@ class SearchController < ApplicationController
     end
 
     @query_sc = ""
+    # Check for translation of whole phrase in Middle Scots
     tr = Translation.find_by language: "scots", translated: @query
 
     if tr.nil?
@@ -369,6 +392,7 @@ class SearchController < ApplicationController
         query_sc = permited[:q].present? ? permited[:q].strip : '*'
         parts = @query.split(" ")
         parts.each do |part|
+          # Search for word-by-word translations in Middle Scots
           tr = Translation.find_by language: "scots", translated: part
 
           unless tr.nil?
@@ -376,6 +400,7 @@ class SearchController < ApplicationController
           end
         end
         unless query_sc.eql? @query
+          # Avoid duplicating queries if word in Middle Scots is the same as in English
           @query_sc = query_sc
         end
       end
@@ -386,6 +411,7 @@ class SearchController < ApplicationController
     end
 
     @query_d = ""
+    # Check for translation of whole phrase in Dutch
     tr = Translation.find_by language: "dutch", translated: @query
 
     if tr.nil?
@@ -393,6 +419,7 @@ class SearchController < ApplicationController
         query_d = permited[:q].present? ? permited[:q].strip : '*'
         parts = @query.split(" ")
         parts.each do |part|
+          # Search for word-by-word translations in Dutch
           tr = Translation.find_by language: "dutch", translated: part
 
           unless tr.nil?
@@ -400,6 +427,7 @@ class SearchController < ApplicationController
           end
         end
         unless query_d.eql? @query
+          # Avoid duplicating queries if word in Dutch is the same as in English
           @query_d = query_d
         end
       end

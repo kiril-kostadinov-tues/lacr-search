@@ -1,5 +1,6 @@
 class TranslationController < ApplicationController
 
+	# Search for a translation to the provided word
 	def get
 		@tr = Translation.find_by word: params[:word], language: params[:lang]
 
@@ -8,6 +9,7 @@ class TranslationController < ApplicationController
 		end
 	end
 
+	# Add a new translation or edit an existing one
 	def edit 
 		if user_signed_in? and current_user.admin?
 			translated = params[:translated]

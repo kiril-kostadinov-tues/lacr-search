@@ -1,5 +1,6 @@
 class CommentController < ApplicationController
 	
+	# Post a new coment
 	def post
 		comment = Comment.new
 		comment.content = params[:content]
@@ -11,9 +12,11 @@ class CommentController < ApplicationController
 		flash[:notice] = "Comment successfully posted."
  	end
 
+ 	# Delete a comment
  	def destroy
  		comment = Comment.where(id: [params[:id].to_i]).first
  		if user_signed_in?
+ 			# Check if the user trying to delete the comment is the owner
  			if current_user.id == comment.user_id
  				comment.destroy
  				redirect_to :back

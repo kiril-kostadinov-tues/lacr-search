@@ -1,4 +1,6 @@
 class SemanticSearchController < ApplicationController
+	
+	# Construct and display the form for semantic search
 	def index
 		offences = Offence.all
 	    verdicts = Verdict.all
@@ -43,6 +45,7 @@ class SemanticSearchController < ApplicationController
 	   end
 	end
 
+	# Create a new annotation category
 	def create_category
 		if Annotation.where(:name => params[:annotation].titleize).empty?
 			Annotation.create(:name => params[:annotation].titleize)
@@ -99,6 +102,7 @@ class SemanticSearchController < ApplicationController
 		
 	end
 
+	# Create a new semantic annotation for paragraph text
 	def word_semantic
 		if params.has_key?(:p) and params.has_key?(:v) \
 	      and params[:v].to_i > 0 and  params[:v].to_i < 1000000 \

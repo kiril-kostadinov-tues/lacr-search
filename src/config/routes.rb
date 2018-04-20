@@ -65,9 +65,11 @@ Rails.application.routes.draw do
   get '/update_lines', to: 'lines#update_lines'
   post '/update_lines', to: 'lines#do_update'
 
+  # Note routes
   post 'notes/create', to: 'note#create'
   get '/notes', to: 'note#index'
 
+  # Deleting comments and notes routes
   delete 'notes/:id', to: 'note#destroy'
   delete 'comments/:id', to: 'comment#destroy'
 end

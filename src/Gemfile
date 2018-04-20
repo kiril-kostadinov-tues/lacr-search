@@ -23,15 +23,12 @@ gem 'coffee-rails'
 gem 'jquery-rails' # Use jquery as the JavaScript library
 gem 'jquery-ui-rails' # Add JavaScript for UI
 
-#background processes
-gem 'sucker_punch'
 
 # Additional gems
 # Ruby Gem of the Bootstrap
 gem 'less-rails' # Javascript runtime
 gem 'twitter-bootstrap-rails'
 gem "font-awesome-rails"
-																																																																																																																									
 gem 'carrierwave' # File upload
 gem 'groupdate' # Simple way to group by: day, week, etc.
 gem 'rubyzip' # Zip files for download

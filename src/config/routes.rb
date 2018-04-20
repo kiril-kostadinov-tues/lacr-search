@@ -51,5 +51,4 @@ Rails.application.routes.draw do
   # Update lines
   get '/update_lines', to: 'lines#update_lines'
   post '/update_lines', to: 'lines#do_update'
-
 end

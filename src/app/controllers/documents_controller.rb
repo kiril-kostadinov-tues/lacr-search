@@ -4,6 +4,7 @@ require 'uri'
 require 'json'
 
 class DocumentsController < ApplicationController
+
   def index
     @documents = Search.select(:page, :volume).distinct.order(volume: :asc, page: :asc).group(:volume, :page)
     @images = []
@@ -114,7 +115,7 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def page  
+  def page
     if params.has_key?(:p) and params.has_key?(:v) \
       and params[:v].to_i > 0 and  params[:v].to_i < 1000000 \
       and params[:p].to_i > 0 and  params[:p].to_i < 1000000
@@ -132,11 +133,9 @@ class DocumentsController < ApplicationController
           # Simple Fix of the file extension after image convert
           @document_image_normal = page_image.image.normal.url.split('.')[0...-1].join + '.jpeg'
           @document_image_large = page_image.image.large.url.split('.')[0...-1].join + '.jpeg'
-
         end
         respond_to do |format|
          format.html { render :partial => "documents/page" }
-
         end
 
       else
@@ -240,7 +239,6 @@ class DocumentsController < ApplicationController
     end
   end
 
-
   def destroy
     if user_signed_in? and current_user.admin?
       selected = params['selected']
@@ -265,7 +263,6 @@ class DocumentsController < ApplicationController
               end
               img[0].destroy
             end   
-
 
             if tr_xml # If the db record was found
               tr_xml.each do |tr|

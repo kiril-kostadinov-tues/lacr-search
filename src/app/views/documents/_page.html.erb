@@ -61,9 +61,8 @@
 <!-- Right Side: Image -->
 <% if @document_image_normal %>
 	<div class="col-md-6">
-
 		<span class='zoom' id="doc-image" data-spy="affix" data-offset-top="205">
-			<%= image_tag(@document_image_normal, id:"page-img", onload:"fuck()", class:"img-rounded img-responsive", data:	{large_image: @document_image_large}) %>
+			<%= image_tag(@document_image_normal, id:"page-img", onload:"loadScript()", class:"img-rounded img-responsive", data:	{large_image: @document_image_large}) %>
 		</span>
 
 		<canvas  id="page-canvas""></canvas>
@@ -72,7 +71,7 @@
 <!-- End of the right side -->
 
 <script type="text/javascript">
-function fuck(){
+function loadScript(){
 		var ctx;
 		var img;
 		var canvas;
@@ -222,4 +221,3 @@ function fuck(){
 		
 	}
 	</script>
-
